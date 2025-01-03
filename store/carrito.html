@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Tienda en Línea</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .carrito-contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .carrito-productos, .carrito-formulario {
+            flex: 1 1 48%;
+            box-sizing: border-box;
+        }
+
+        .formulario-cliente input, .formulario-cliente select {
+            display: block;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .producto-carrito {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .producto-carrito img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .btn-pagar {
+            display: block;
+            margin: 1rem auto 0;
+            padding: 10px 20px;
+            background-color: #f4c542;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+        }
+
+        .btn-pagar:hover {
+            background-color: #d4a12f;
+        }
+
+        @media (max-width: 768px) {
+            .carrito-productos, .carrito-formulario {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Carrito de Compras</h1>
+        <nav class="navbar">
+            <ul>
+                <li><a href="../index.html">Inicio</a></li>
+                <li><a href="productos.html">Productos</a></li>
+                <li><a href="carrito.html">Carrito</a></li>
+                <li><a href="admin.html">Administrador</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="carrito">
+            <div class="carrito-contenedor">
+                <!-- Columna 1: Productos seleccionados -->
+                <div class="carrito-productos">
+                    <h2>Productos Seleccionados</h2>
+                    <div id="productos-seleccionados">
+                        <!-- Productos seleccionados aparecerán aquí dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Columna 2: Formulario de cliente -->
+                <div class="carrito-formulario">
+                    <h2>Datos del Cliente</h2>
+                    <form class="formulario-cliente">
+                        <input type="text" id="nombre" name="nombre" placeholder="Nombre Completo" required>
+
+                        <select id="documento" name="documento" required>
+                            <option value="" disabled selected>Seleccione Documento</option>
+                            <option value="cedula">Cédula de Ciudadanía</option>
+                            <option value="cedula-ext">Cédula de Extranjería</option>
+                            <option value="pasaporte">Pasaporte</option>
+                            <option value="pep">PEP</option>
+                        </select>
+
+                        <input type="text" id="numero-documento" name="numero-documento" placeholder="Número de Documento" required>
+
+                        <input type="tel" id="telefono1" name="telefono1" placeholder="Teléfono 1" required>
+
+                        <input type="tel" id="telefono2" name="telefono2" placeholder="Teléfono 2 (opcional)">
+
+                        <input type="text" id="direccion" name="direccion" placeholder="Dirección de Entrega" required>
+
+                        <input type="text" id="ciudad" name="ciudad" placeholder="Municipio/Ciudad" required>
+
+                        <button type="submit" class="btn-pagar">Pagar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tienda en Línea. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        function cargarCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            const contenedor = document.getElementById('productos-seleccionados');
+
+            contenedor.innerHTML = '';
+
+            carrito.forEach(producto => {
+                const productoDiv = document.createElement('div');
+                productoDiv.className = 'producto-carrito';
+                productoDiv.innerHTML = `
+                    <img src="../img/${producto.nombre.toLowerCase().replace(/ /g, '')}.jpg" alt="${producto.nombre}">
+                    <p>${producto.nombre} - $${producto.precio} x ${producto.cantidad}</p>
+                    <button onclick="eliminarProducto('${producto.nombre}')">Eliminar</button>
+                `;
+                contenedor.appendChild(productoDiv);
+            });
+        }
+
+        function eliminarProducto(nombre) {
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            carrito = carrito.filter(producto => producto.nombre !== nombre);
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            cargarCarrito();
+        }
+
+        window.onload = cargarCarrito;
+    </script>
+</body>
+</html>

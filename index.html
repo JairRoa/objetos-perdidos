@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <title>Inicio - Tienda en Línea</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            left: 1rem;
+        }
+
+        .logo img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .logo h1 {
+            display: none; /* Ocultar el título en el bloque del logo */
+        }
+
+        .main-title {
+            flex: 1;
+            text-align: center;
+            margin: 0;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .navbar {
+            flex: 1 100%;
+            background-color: #f4c542;
+            padding: 0.5rem 0;
+        }
+
+        .navbar ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar li {
+            margin: 0 1rem;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #f4c542;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .navbar li {
+                margin: 0.5rem 0;
+            }
+
+            .main-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="img/logo.png" alt="Tienda en Línea">
+        </div>
+        <h1 class="main-title">Tienda en Línea</h1>
+        <nav class="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="/store/productos.html">Productos</a></li>
+                <li><a href="/store/carrito.html">Carrito</a></li>
+                <li><a href="/store/admin.html">Administrador</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Bienvenido a Tienda en Línea</h2>
+        <p>Encuentra los mejores productos al mejor precio. Explora nuestras categorías y llena tu carrito.</p>
+        <a href="/store/productos.html" class="btn-explorar">Explorar Productos</a>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tienda en Línea. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
