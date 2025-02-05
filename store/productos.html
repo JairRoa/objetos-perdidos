@@ -5,9 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productos - Tienda en Línea</title>
     <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* Estilos para la navegación */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4c542;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .menu-toggle {
+            display: none;
+            background-color: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute;
+            left: 10px;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar ul li {
+            display: inline;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Menú hamburguesa en pantallas pequeñas */
+        @media (max-width: 600px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .navbar ul {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                background-color: #f4c542;
+                width: 100%;
+                top: 60px;
+                left: 0;
+                padding: 1rem 0;
+                text-align: center;
+            }
+
+            .navbar ul.active {
+                display: flex;
+            }
+        }
+
+        /* Estilos para los productos */
+        .productos {
+            text-align: center;
+        }
+
+        .producto {
+            display: inline-block;
+            width: 90%;
+            max-width: 300px;
+            margin: 1rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: white;
+        }
+
+        /* Ajustar tamaño de las imágenes */
+        .producto img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .producto img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Ajustar el campo de cantidad */
+        .producto input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        /* Ajustar el botón de agregar al carrito */
+        .producto button {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: #f4c542;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .producto button:hover {
+            background-color: #d4a12f;
+        }
+    </style>
 </head>
 <body>
     <header>
+        <button class="menu-toggle">☰</button>
         <h1>Productos</h1>
         <nav class="navbar">
             <ul>
@@ -22,36 +150,20 @@
     <main>
         <section class="productos">
             <h2>Nuestros Productos</h2>
-            <div class="productos-lista">
-                <!-- Productos dinámicos aquí -->
-                <div class="producto">
-                    <img src="../img/producto1.jpg" alt="Producto 1">
-                    <h3>Producto 1</h3>
-                    <p>$19.99</p>
-                    <label for="cantidad1">Cantidad:</label>
-                    <input type="number" id="cantidad1" min="1" value="1">
-                    <button onclick="agregarAlCarrito('Producto 1', 19.99, document.getElementById('cantidad1').value)">Agregar al Carrito</button>
-                </div>
-                <div class="producto">
-                    <img src="../img/producto2.jpg" alt="Producto 2">
-                    <h3>Producto 2</h3>
-                    <p>$25.99</p>
-                    <label for="cantidad2">Cantidad:</label>
-                    <input type="number" id="cantidad2" min="1" value="1">
-                    <button onclick="agregarAlCarrito('Producto 2', 25.99, document.getElementById('cantidad2').value)">Agregar al Carrito</button>
-                </div>
+            <div id="productos-lista">
+                <p>Cargando productos...</p>
             </div>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2025 Tienda en Línea. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Hacienda la Violeta. Todos los derechos reservados.</p>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-    
+
         const firebaseConfig = {
             apiKey: "AIzaSyBgIheO2RtRC55SVBCkZfomoElB2Lu1UVY",
             authDomain: "hacienda-la-violeta.firebaseapp.com",
@@ -61,39 +173,80 @@
             appId: "1:892026900805:web:47453888b443aa6681ee2c",
             measurementId: "G-EPJL0ZKWP3"
         };
-    
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-    
+
         async function loadProducts() {
-            const productList = document.querySelector('.productos-lista');
+            const productList = document.getElementById('productos-lista');
             productList.innerHTML = '';
-    
+
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
+
+                if (querySnapshot.empty) {
+                    productList.innerHTML = '<p>No hay productos disponibles.</p>';
+                    return;
+                }
+
                 querySnapshot.forEach((doc) => {
                     const product = doc.data();
+                    const imageUrl = product.imageUrl && product.imageUrl.trim() !== ""
+                        ? product.imageUrl
+                        : "/img/generic.png"; 
+
                     const card = `
                         <div class="producto">
-                            <img src="${product.imageUrl}" alt="${product.name}">
+                            <img src="${imageUrl}" alt="${product.name}" onerror="this.onerror=null; this.src='/img/generic.png';">
                             <h3>${product.name}</h3>
                             <p>${product.weight}</p>
-                            <p>$${product.price.toFixed(2)}</p>
+                            <p><strong>Precio: </strong>$${Number(product.price).toFixed(2)}</p>
                             <label for="cantidad-${doc.id}">Cantidad:</label>
                             <input type="number" id="cantidad-${doc.id}" min="1" value="1">
-                            <button onclick="agregarAlCarrito('${product.name}', ${product.price}, document.getElementById('cantidad-${doc.id}').value)">Agregar al Carrito</button>
+                            <button onclick="agregarAlCarrito('${doc.id}', '${product.name}', ${Number(product.price)}, document.getElementById('cantidad-${doc.id}').value, '${imageUrl}')">
+                                Agregar al Carrito
+                            </button>
                         </div>`;
                     productList.innerHTML += card;
                 });
+
             } catch (error) {
                 console.error("Error al cargar productos:", error);
+                productList.innerHTML = '<p>Error al cargar productos. Verifica tu conexión o permisos.</p>';
             }
         }
-    
+
         window.onload = () => {
             loadProducts();
         };
+
+        // **Función para agregar productos al carrito**
+        window.agregarAlCarrito = function(id, name, price, quantity, imageUrl) {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+    const index = carrito.findIndex(item => item.id === id);
+
+    if (index !== -1) {
+        carrito[index].quantity += parseInt(quantity);
+        carrito[index].totalPrice = carrito[index].quantity * carrito[index].price;
+    } else {
+        carrito.push({
+            id,
+            name,
+            price,
+            quantity: parseInt(quantity),
+            totalPrice: parseInt(quantity) * price,
+            imageUrl: imageUrl && imageUrl.trim() !== "" ? imageUrl : "/img/generic.png" // 🔹 Asegura que se almacene
+        });
+    }
+
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    alert(`"${name}" agregado al carrito.`);
+};
+
+        document.querySelector(".menu-toggle").addEventListener("click", () => {
+            document.querySelector(".navbar ul").classList.toggle("active");
+        });
     </script>
-    
 </body>
 </html>

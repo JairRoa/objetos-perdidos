@@ -83,6 +83,16 @@
             color: #fff;
         }
 
+        #products-table-body img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover; /* Asegura que la imagen se recorte proporcionalmente */
+    display: block;
+    margin: auto; /* Centra la imagen en la celda */
+    border-radius: 5px; /* Opcional: bordes redondeados */
+}
+
+
         .logout-button {
             position: absolute;
             top: 1rem;
@@ -177,6 +187,7 @@
             
                 <button type="submit">Agregar Producto</button>
             </form>
+            
             
             <h3>Productos Existentes</h3>
             <table>
