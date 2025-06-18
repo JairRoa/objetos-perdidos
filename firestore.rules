@@ -2,32 +2,28 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // — Usuarios: solo auth pueden leer, y solo admin pueden escribir —
     match /users/{userId} {
-      // Lectura: cualquier usuario autenticado
-      allow read: if request.auth != null;
-
-      // Crear:
-      // • Si el uid coincide con el doc que se está creando (cada quien crea su propia ficha), 
-      // • o si ya eres admin en tu propio doc.
-      allow create: if request.auth != null
-        && (
-             request.auth.uid == request.resource.data.uid
-          || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
-        );
-
-      // Actualizar / borrar: sólo admins
-      allow update, delete: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    match /objects/{objectId} {
       allow read:   if request.auth != null;
-      allow create: if request.auth != null;
+      allow create: if request.auth != null
+                   && (request.auth.uid == request.resource.data.uid
+                       || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
       allow update, delete: if request.auth != null
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+                   && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Bloquea todo lo demás
+    // — Objetos: LECTURA PÚBLICA —  
+    match /objects/{objectId} {
+      // Cualquiera (incluso no auth) puede leer
+      allow read: if true;
+      // Solo auth puede crear
+      allow create: if request.auth != null;
+      // Solo admin puede actualizar o eliminar
+      allow update, delete: if request.auth != null
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // — Bloquea todo lo demás —
     match /{document=**} {
       allow read, write: if false;
     }

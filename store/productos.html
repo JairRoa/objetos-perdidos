@@ -3,183 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Productos - Tienda en Línea</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <title>Objetos Perdidos</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
     :root {
       --verde-principal: #2e9d57;
-      --verde-claro: #7dd081;
+      --verde-claro:    #7dd081;
       --amarillo-abeja: #f9d94e;
-      --azul-oscuro: #2b4f97;
-      --negro: #1a1a1a;
-      --blanco: #fefefe;
+      --azul-oscuro:    #2b4f97;
+      --negro:          #1a1a1a;
+      --blanco:         #fefefe;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
+    *, *::before, *::after {
+      margin: 0; padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: Arial, sans-serif;
       color: var(--negro);
       background: url("../img/background.png") no-repeat center center fixed;
       background-size: cover;
     }
-
     header {
-      background-color: var(--verde-principal);
+      background: var(--verde-principal);
       padding: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      position: relative;
       text-align: center;
+      position: relative;
+      color: var(--blanco);
     }
-
     .menu-toggle {
       display: none;
-      background: none;
-      border: none;
-      font-size: 1.8rem;
-      color: var(--amarillo-abeja);
-      position: absolute;
-      left: 1rem;
-      top: 1rem;
+      position: absolute; left: 1rem; top: 1rem;
+      background: none; border: none;
+      font-size: 1.8rem; color: var(--amarillo-abeja);
       cursor: pointer;
     }
-
     header h1 {
-      width: 100%;
-      color: var(--blanco);
       font-size: 2rem;
-      margin-bottom: 0.5rem;
     }
-
-    .navbar {
-      width: 100%;
-    }
-
-    .navbar ul {
+    nav.navbar ul {
       list-style: none;
       display: flex;
       justify-content: center;
       gap: 1rem;
-      padding: 0;
+      margin-top: 0.5rem;
     }
-
-    .navbar ul li a {
+    nav.navbar a {
+      color: var(--blanco);
       text-decoration: none;
       font-weight: bold;
-      color: var(--blanco);
       transition: color 0.3s;
     }
-
-    .navbar ul li a:hover {
-      color: var(--amarillo-abeja);
+    nav.navbar a:hover { color: var(--amarillo-abeja); }
+    @media (max-width: 768px) {
+      .menu-toggle { display: block; }
+      nav.navbar ul {
+        display: none;
+        flex-direction: column;
+        background: var(--verde-principal);
+        position: absolute; top:100%; left:0; width:100%;
+      }
+      nav.navbar ul.active { display: flex; }
     }
-
     main {
       padding: 2rem;
       text-align: center;
     }
-
     .productos h2 {
       color: var(--azul-oscuro);
       margin-bottom: 1rem;
     }
-
     .producto {
-      background-color: var(--blanco);
+      background: var(--blanco);
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       display: inline-block;
       margin: 1rem;
       max-width: 300px;
       padding: 1rem;
-      text-align: center;
+      vertical-align: top;
+      text-align: left;
     }
-
     .producto img {
-      width: 200px;
+      width: 100%;
       height: 200px;
-      object-fit: contain;
+      object-fit: cover;
       border-radius: 5px;
     }
-
     .producto h3 {
       margin: 0.5rem 0;
+      color: var(--verde-principal);
     }
-
-    .producto input[type="number"] {
+    .producto p {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+    }
+    .producto .reclamar-btn {
+      display: block;
       width: 100%;
       padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      margin-top: 0.5rem;
-    }
-
-    .producto button {
-      width: 100%;
-      padding: 0.5rem;
-      background-color: var(--amarillo-abeja);
-      border: none;
+      background: var(--amarillo-abeja);
       color: var(--negro);
-      font-weight: bold;
+      border: none;
       border-radius: 5px;
+      font-weight: bold;
+      text-align: center;
       margin-top: 0.5rem;
       cursor: pointer;
-      transition: background-color 0.3s, transform 0.2s;
+      transition: background 0.3s, transform 0.2s;
     }
-
-    .producto button:hover {
-      background-color: var(--verde-claro);
+    .producto .reclamar-btn:hover {
+      background: var(--verde-claro);
       transform: scale(1.03);
     }
-
     footer {
       text-align: center;
       padding: 1rem;
-      background-color: var(--verde-principal);
+      background: var(--verde-principal);
       color: var(--blanco);
-    }
-
-    @media (max-width: 768px) {
-      .menu-toggle {
-        display: block;
-      }
-
-      .navbar ul {
-        display: none;
-        flex-direction: column;
-        background-color: var(--verde-principal);
-        width: 100%;
-        padding: 1rem 0;
-        text-align: center;
-      }
-
-      .navbar ul.active {
-        display: flex;
-      }
-
-      .producto img {
-        width: 100px;
-        height: 100px;
-      }
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
   <header>
     <button class="menu-toggle"><i class="fas fa-bars"></i></button>
-    <h1>Productos</h1>
+    <h1>Objetos Perdidos</h1>
     <nav class="navbar">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="productos.html">Productos</a></li>
+        <li><a href="productos.html">Objetos</a></li>
         <li><a href="carrito.html">Carrito</a></li>
         <li><a href="admin.html">Administrador</a></li>
       </ul>
@@ -188,9 +142,9 @@
 
   <main>
     <section class="productos">
-      <h2>Nuestros Productos</h2>
+      <h2>Últimos Objetos Registrados</h2>
       <div id="productos-lista">
-        <p>Cargando productos...</p>
+        <p>Cargando objetos...</p>
       </div>
     </section>
   </main>
@@ -199,79 +153,70 @@
     <p>&copy; 2025 Hacienda la Violeta. Todos los derechos reservados.</p>
   </footer>
 
-  <!-- Toggle menú móvil -->
   <script>
-    document.querySelector(".menu-toggle").addEventListener("click", () => {
-      document.querySelector(".navbar ul").classList.toggle("active");
-    });
+    document.querySelector(".menu-toggle")
+      .addEventListener("click", () => {
+        document.querySelector(".navbar ul").classList.toggle("active");
+      });
   </script>
 
-  <!-- Firebase + carga de productos y carrito -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
     import {
       getFirestore,
       collection,
-      getDocs
+      getDocs,
+      query,
+      orderBy
     } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
-  authDomain: "objetosperdidos-76abd.firebaseapp.com",
-  projectId: "objetosperdidos-76abd",
-  storageBucket: "objetosperdidos-76abd.firebasestorage.app",
-  messagingSenderId: "609690831592",
-  appId: "1:609690831592:web:f7a276b069c426ef53175d",
-  measurementId: "G-95C30B5EK1"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
+      authDomain: "objetosperdidos-76abd.firebaseapp.com",
+      projectId: "objetosperdidos-76abd",
+      storageBucket: "objetosperdidos-76abd.appspot.com",
+      messagingSenderId: "609690831592",
+      appId: "1:609690831592:web:f7a276b069c426ef53175d",
+      measurementId: "G-95C30B5EK1"
+    };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db  = getFirestore(app);
 
-    async function cargarProductos() {
+    async function cargarObjetos() {
       const cont = document.getElementById("productos-lista");
       cont.innerHTML = "";
       try {
-        const snap = await getDocs(collection(db, "productos"));
+        const q    = query(collection(db, "objects"), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
         if (snap.empty) {
-          cont.innerHTML = "<p>No hay productos disponibles.</p>";
+          cont.innerHTML = "<p>No hay objetos registrados.</p>";
           return;
         }
         snap.forEach(doc => {
-          const p = doc.data();
+          const o = doc.data();
+          const nameEncoded = encodeURIComponent(o.name);
           cont.innerHTML += `
             <div class="producto">
-              <img src="${p.imagenUrl || 'https://via.placeholder.com/200'}" alt="${p.nombre}" />
-              <h3>${p.nombre}</h3>
-              <p><strong>Precio:</strong> $${p.precio?.toLocaleString("es-CO")}</p>
-              <input type="number" min="1" value="1" id="cant-${doc.id}" />
-              <button onclick="agregarAlCarrito('${doc.id}', '${p.nombre}', ${p.precio})">
-                Agregar al carrito
+              <img src="${o.imageUrl || 'https://via.placeholder.com/300'}" alt="${o.name}" />
+              <h3>${o.name}</h3>
+              <p><strong>Fecha registro:</strong> ${o.createdAt?.toDate().toLocaleString("es-CO") || ""}</p>
+              <p><strong>Descripción:</strong> ${o.description}</p>
+              <p><strong>Lugar:</strong> ${o.location}</p>
+              <button class="reclamar-btn"
+                      onclick="location.href='carrito.html?id=${doc.id}&name=${nameEncoded}'">
+                Reclamar
               </button>
-            </div>
-          `;
+            </div>`;
         });
       } catch (err) {
-        console.error("Error cargando productos:", err);
-        cont.innerHTML = "<p>Error al cargar productos.</p>";
+        console.error("Error cargando objetos:", err);
+        cont.innerHTML = "<p>Error al cargar objetos.</p>";
       }
     }
 
-    window.agregarAlCarrito = (id, nombre, precio) => {
-      const qty = parseInt(document.getElementById(`cant-${id}`).value) || 1;
-      const cart = JSON.parse(localStorage.getItem("carrito")) || [];
-      const found = cart.find(i => i.id === id);
-      if (found) {
-        found.cantidad += qty;
-      } else {
-        cart.push({ id, nombre, precio, cantidad: qty });
-      }
-      localStorage.setItem("carrito", JSON.stringify(cart));
-      alert("Producto agregado al carrito.");
-    };
-
-    cargarProductos();
+    cargarObjetos();
   </script>
 </body>
 </html>
