@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <title>Carrito - Objetos Perdidos</title>
+  <title>Carrito – Objetos Perdidos</title>
 
   <!-- Hoja de estilos global -->
   <link rel="stylesheet" href="styles.css" />
@@ -30,6 +30,13 @@
     const db  = getFirestore(app);
   </script>
 
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+  <script>
+    // Inicializa EmailJS con tu User ID (lo encuentras en tu dashboard de EmailJS)
+    emailjs.init('TU_USER_ID_EMAILJS');
+  </script>
+
   <style>
     :root {
       --verde-principal: #2e9d57;
@@ -39,8 +46,7 @@
     }
     *, *::before, *::after {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     body {
       font-family: Arial, Helvetica, sans-serif;
@@ -104,7 +110,8 @@
       margin-bottom: 2rem;
       text-align: left;
       max-width: 600px;
-      margin: 0 auto;
+      margin-left: auto;
+      margin-right: auto;
     }
     #producto-seleccionado img {
       width: 100%;
@@ -119,7 +126,8 @@
       display: grid;
       gap: 1rem;
       max-width: 600px;
-      margin: 0 auto;
+      margin-left: auto;
+      margin-right: auto;
     }
     form label { font-weight: bold; }
     form input,
@@ -152,7 +160,8 @@
       font-weight: bold;
       text-align: center;
       max-width: 600px;
-      margin: 0 auto;
+      margin-left: auto;
+      margin-right: auto;
     }
     footer {
       text-align: center;
@@ -171,6 +180,7 @@
   </style>
 </head>
 <body>
+
   <header>
     <div class="logo"><img src="img/logto wilferson.png" alt="Logo" /></div>
     <h1 class="main-title">RECLAMAR OBJETO</h1>
@@ -258,7 +268,7 @@
           return;
         }
         const o = snap.data();
-       	selectedName.value = objNameParam || o.name;
+        selectedName.value = objNameParam || o.name;
         contProducto.innerHTML = `
           <img src="${o.imageUrl||'https://via.placeholder.com/400'}" alt="${o.name}" />
           <h3>${o.name}</h3>
@@ -280,34 +290,55 @@
     }
 
     document.getElementById("client-form")
-      .addEventListener("submit", e => {
+      .addEventListener("submit", async e => {
         e.preventDefault();
+
+        // 1) Recoger datos
         const nombre     = document.getElementById("cliente-nombre").value.trim();
         const docType    = document.getElementById("cliente-doc").value;
+        const idNum      = document.getElementById("cliente-id").value.trim();
         const facultad   = document.getElementById("cliente-facultad").value.trim();
         const telefono   = document.getElementById("cliente-telefono").value.trim();
         const correo     = document.getElementById("cliente-correo").value.trim();
         const objetoName = selectedName.value;
         const codigo     = generarCodigo();
 
-        const divCod = document.getElementById("codigo");
-        divCod.textContent = `Este es tu código de radicado: ${codigo}`;
-        divCod.style.display = "block";
-
+        // 2) Preparar mensaje
         let body = `Código de radicado: ${codigo}\n\n`;
         body += `Objeto reclamado: ${objetoName}\n\n`;
         body += `-- Datos del cliente --\n`;
         body += `Nombre: ${nombre}\n`;
-        body += `Documento: ${docType}\n`;
+        body += `Documento: ${docType} (${idNum})\n`;
         body += `Facultad o dependencia: ${facultad}\n`;
         body += `Teléfono: ${telefono}\n`;
         body += `Correo institucional: ${correo}\n`;
 
-        const mailto = `mailto:hdaza@universidadean.edu.co`
-                     + `?cc=${encodeURIComponent(correo)}`
-                     + `&subject=${encodeURIComponent("Entrega de objeto perdido")}`
-                     + `&body=${encodeURIComponent(body)}`;
-        window.location.href = mailto;
+        // 3) Parámetros EmailJS
+        const templateParams = {
+          to_email:  "hdaza@universidadean.edu.co",
+          cc_email:  correo,
+          subject:   "Entrega de objeto perdido",
+          message:   body
+        };
+
+        try {
+          // 4) Enviar
+          await emailjs.send(
+            "service_aedsi78",    // Service ID
+            "template_3bnrbjd",   // Template ID
+            templateParams
+          );
+
+          // 5) Confirmación emergente
+          alert(
+            "Correo enviado correctamente a hdaza@universidadean.edu.co\n\n" +
+            "Tu número de radicado de solicitud es:\n\n" +
+            `Código de radicado: ${codigo}`
+          );
+        } catch (err) {
+          console.error("Error enviando correo:", err);
+          alert("Hubo un error al enviar el correo. Por favor, inténtalo de nuevo.");
+        }
       });
   </script>
 </body>
