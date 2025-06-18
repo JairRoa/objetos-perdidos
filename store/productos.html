@@ -199,10 +199,79 @@
     <p>&copy; 2025 Hacienda la Violeta. Todos los derechos reservados.</p>
   </footer>
 
+  <!-- Toggle menú móvil -->
   <script>
     document.querySelector(".menu-toggle").addEventListener("click", () => {
       document.querySelector(".navbar ul").classList.toggle("active");
     });
+  </script>
+
+  <!-- Firebase + carga de productos y carrito -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
+  authDomain: "objetosperdidos-76abd.firebaseapp.com",
+  projectId: "objetosperdidos-76abd",
+  storageBucket: "objetosperdidos-76abd.firebasestorage.app",
+  messagingSenderId: "609690831592",
+  appId: "1:609690831592:web:f7a276b069c426ef53175d",
+  measurementId: "G-95C30B5EK1"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function cargarProductos() {
+      const cont = document.getElementById("productos-lista");
+      cont.innerHTML = "";
+      try {
+        const snap = await getDocs(collection(db, "productos"));
+        if (snap.empty) {
+          cont.innerHTML = "<p>No hay productos disponibles.</p>";
+          return;
+        }
+        snap.forEach(doc => {
+          const p = doc.data();
+          cont.innerHTML += `
+            <div class="producto">
+              <img src="${p.imagenUrl || 'https://via.placeholder.com/200'}" alt="${p.nombre}" />
+              <h3>${p.nombre}</h3>
+              <p><strong>Precio:</strong> $${p.precio?.toLocaleString("es-CO")}</p>
+              <input type="number" min="1" value="1" id="cant-${doc.id}" />
+              <button onclick="agregarAlCarrito('${doc.id}', '${p.nombre}', ${p.precio})">
+                Agregar al carrito
+              </button>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("Error cargando productos:", err);
+        cont.innerHTML = "<p>Error al cargar productos.</p>";
+      }
+    }
+
+    window.agregarAlCarrito = (id, nombre, precio) => {
+      const qty = parseInt(document.getElementById(`cant-${id}`).value) || 1;
+      const cart = JSON.parse(localStorage.getItem("carrito")) || [];
+      const found = cart.find(i => i.id === id);
+      if (found) {
+        found.cantidad += qty;
+      } else {
+        cart.push({ id, nombre, precio, cantidad: qty });
+      }
+      localStorage.setItem("carrito", JSON.stringify(cart));
+      alert("Producto agregado al carrito.");
+    };
+
+    cargarProductos();
   </script>
 </body>
 </html>

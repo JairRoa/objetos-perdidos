@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de Administrador</title>
-  <!-- Ruta absoluta al CSS global -->
+
+  <!-- Hoja de estilos global (sube a la raíz del hosting) -->
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -14,7 +15,7 @@
       <ul>
         <li><a href="/index.html">Inicio</a></li>
         <li><a href="/store/productos.html">Productos</a></li>
-        <li><a href="/store/carrito.html">Carrito</a></li>
+        <li><a href="/store/carrito.html">Formulario</a></li>
         <li><a href="/store/admin.html">Administrador</a></li>
       </ul>
     </nav>
@@ -23,7 +24,8 @@
   <main>
     <section id="login-section">
       <h2>Iniciar Sesión</h2>
-      <form id="login-form">
+
+      <form id="login-form" autocomplete="off">
         <label for="email">Correo Electrónico:</label>
         <input type="email" id="email" required />
 
@@ -39,39 +41,47 @@
     <p>&copy; 2025 Hacienda la Violeta. Todos los derechos reservados.</p>
   </footer>
 
-  <!-- Login con Firebase v11 (modular) -->
+  <!-- SDK Firebase v 11 (modular) -->
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { initializeApp }                       from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBrh5AP2ErXaQcZbDNMHPq_5cBrvNZI1lW0",
-    authDomain: "objetosperdidos-76abd.firebaseapp.com",
-    projectId: "objetosperdidos-76abd",
-    storageBucket: "objetosperdidos-76abd.appspot.com",
-    messagingSenderId: "609690831592",
-    appId: "1:609690831592:web:f7a276b069c426ef53175d",
-    measurementId: "G-9SC30B5EK1"
-  };
+    /*  🔑 CONFIG de TU proyecto  (copia/pega desde Firebase > Engranaje > Configuración general > tu app web)  */
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
+  authDomain: "objetosperdidos-76abd.firebaseapp.com",
+  projectId: "objetosperdidos-76abd",
+  storageBucket: "objetosperdidos-76abd.firebasestorage.app",
+  messagingSenderId: "609690831592",
+  appId: "1:609690831592:web:f7a276b069c426ef53175d",
+  measurementId: "G-95C30B5EK1"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-  document.getElementById("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+    /* ----------  LOGIN  ---------- */
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email    = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Inicio de sesión exitoso.");
-      window.location.href = "/users/addUser.html";
-    } catch (err) {
-      console.error("Auth error:", err.code);
-      alert("Error de autenticación: " + err.code);
-    }
-  });
-</script>
-
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Inicio de sesión exitoso.");
+        /* Redirige al panel de gestión */
+        window.location.href = "/users/addUser.html";
+      } catch (err) {
+        console.error("Auth error:", err.code, err.message);
+        let msg = "Error de autenticación.";
+        if (err.code === "auth/invalid-email")   msg = "Correo electrónico no válido.";
+        if (err.code === "auth/user-not-found")  msg = "Usuario no encontrado.";
+        if (err.code === "auth/wrong-password")  msg = "Contraseña incorrecta.";
+        if (err.code === "auth/too-many-requests") msg = "Demasiados intentos. Intenta más tarde.";
+        alert(msg);
+      }
+    });
+  </script>
 </body>
 </html>

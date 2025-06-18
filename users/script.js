@@ -1,98 +1,78 @@
 // users/script.js
 
-// Importar módulos de Firebase (v11 modular)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  setDoc,
-  deleteDoc
+  getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import {
-  getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword
+  getAuth, onAuthStateChanged, createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-// Configuración de Firebase (app “objetosperdidos-76abd”)
+// ✅ Config Firebase (verifica que coincida con tu app web)
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBrh5AP2ErXaQcZbDNMHPq_5cBrvNZI1lW0",
+  apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
   authDomain: "objetosperdidos-76abd.firebaseapp.com",
   projectId: "objetosperdidos-76abd",
-  storageBucket: "objetosperdidos-76abd.appspot.com",
+  storageBucket: "objetosperdidos-76abd.firebasestorage.app",
   messagingSenderId: "609690831592",
-  appId: "1:609690831592:web:2d2e3158d1f3874453175d",
-  measurementId: "G-011BZDH0HB"
+  appId: "1:609690831592:web:f7a276b069c426ef53175d",
+  measurementId: "G-95C30B5EK1"
 };
 
-// Configuración de Cloudinary
+// Cloudinary config
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dplgx0sze/image/upload";
-const CLOUDINARY_UPLOAD_PRESET = "hacienda-la-violeta";
-const CLOUDINARY_API_KEY = "836231553993721";   // tu api_key pública
-// (la api_secret se queda SOLO en el servidor)
+const CLOUDINARY_PRESET = "hacienda-la-violeta";
+const CLOUDINARY_API_KEY = "836231553993721";
 
-
-// Inicializar Firebase y servicios
+// Firebase init
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Verifica usuario antes de mostrar el panel
+// Autenticación: redirección si no hay usuario
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     alert("No estás autenticado. Inicia sesión.");
     window.location.href = "../store/admin.html";
   } else {
-    console.log("Usuario autenticado:", user.email);
     loadUsers();
     loadObjects();
   }
 });
 
-/**
- * Sube una imagen a Cloudinary usando firma generada por el backend
- */
+// Upload seguro a Cloudinary (firma generada por backend)
 async function uploadImage(file) {
-  // 1) Preparo el timestamp y pido la firma al servidor
   const timestamp = Math.floor(Date.now() / 1000);
-  const sigRes = await fetch("http://localhost:3000/get-signature", {
+  const res = await fetch("http://localhost:3000/get-signature", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       params_to_sign: {
         timestamp,
-        upload_preset: CLOUDINARY_UPLOAD_PRESET
+        upload_preset: CLOUDINARY_PRESET
       }
     })
   });
-  const { signature } = await sigRes.json();
+  const { signature } = await res.json();
 
-  // 2) Construyo el FormData con todos los campos obligatorios
   const formData = new FormData();
   formData.append("file", file);
   formData.append("api_key", CLOUDINARY_API_KEY);
   formData.append("timestamp", timestamp);
   formData.append("signature", signature);
-  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  formData.append("upload_preset", CLOUDINARY_PRESET);
 
-  // 3) Subo a Cloudinary
-  try {
-    const res = await fetch(CLOUDINARY_URL, {
-      method: "POST",
-      body: formData
-    });
-    const data = await res.json();
-    return data.secure_url;
-  } catch (err) {
-    console.error("Error al subir imagen:", err);
-    return null;
-  }
+  const uploadRes = await fetch(CLOUDINARY_URL, {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await uploadRes.json();
+  return data.secure_url || null;
 }
 
-// Agregar un nuevo objeto perdido
+// Crear nuevo objeto
 async function addObject(event) {
   event.preventDefault();
 
@@ -108,65 +88,62 @@ async function addObject(event) {
 
   let imageUrl = "https://via.placeholder.com/150";
   if (imageFile) {
-    const uploadedUrl = await uploadImage(imageFile);
-    if (uploadedUrl) imageUrl = uploadedUrl;
+    const url = await uploadImage(imageFile);
+    if (url) imageUrl = url;
   }
 
   try {
     await addDoc(collection(db, "objects"), {
-      name,
-      date,
-      description,
-      location,
-      imageUrl
+      name, date, description, location, imageUrl
     });
-    alert("Objeto agregado correctamente.");
+    alert("Objeto agregado.");
     document.getElementById("add-object-form").reset();
     loadObjects();
   } catch (err) {
-    console.error("Error al agregar objeto:", err);
-    alert("No fue posible agregar el objeto.");
+    console.error("Error al guardar objeto:", err);
+    alert("No fue posible guardar.");
   }
 }
 
-// Cargar y renderizar objetos
-async function loadObjects() {
-  const tbody = document.getElementById("objects-table-body");
-  tbody.innerHTML = "";
-
-  try {
-    const snap = await getDocs(collection(db, "objects"));
-    let idx = 1;
-    snap.forEach(docSnap => {
-      const o = docSnap.data();
-      tbody.innerHTML += `
-        <tr>
-          <td>${idx++}</td>
-          <td>${o.name}</td>
-          <td>${o.date}</td>
-          <td>${o.description}</td>
-          <td>${o.location}</td>
-          <td><img src="${o.imageUrl}" alt="${o.name}"></td>
-          <td>
-            <button onclick="deleteObject('${docSnap.id}')">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </td>
-        </tr>`;
-    });
-  } catch (err) {
-    console.error("Error al cargar objetos:", err);
-  }
-}
-
-// Eliminar un objeto
+// Eliminar objeto
 async function deleteObject(id) {
   if (!confirm("¿Eliminar este objeto?")) return;
   try {
     await deleteDoc(doc(db, "objects", id));
     loadObjects();
   } catch (err) {
-    console.error("Error al eliminar objeto:", err);
+    console.error("Error al eliminar:", err);
+  }
+}
+
+// Cargar lista de objetos
+async function loadObjects() {
+  const tbody = document.getElementById("objects-table-body");
+  tbody.innerHTML = "";
+
+  try {
+    const snap = await getDocs(collection(db, "objects"));
+    let i = 1;
+    snap.forEach(docSnap => {
+      const obj = docSnap.data();
+      tbody.innerHTML += `
+        <tr>
+          <td>${i++}</td>
+          <td>${obj.name}</td>
+          <td>${obj.date}</td>
+          <td>${obj.description}</td>
+          <td>${obj.location}</td>
+          <td><img src="${obj.imageUrl}" alt="${obj.name}" /></td>
+          <td>
+            <button onclick="deleteObject('${docSnap.id}')">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  } catch (err) {
+    console.error("Error al cargar objetos:", err);
   }
 }
 
@@ -191,65 +168,56 @@ async function addUser(event) {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pwd);
     await setDoc(doc(db, "users", cred.user.uid), {
-      uid: cred.user.uid,
-      name,
-      role,
-      email,
-      phone
+      uid: cred.user.uid, name, role, email, phone
     });
-    alert("Usuario agregado correctamente.");
+    alert("Usuario agregado.");
     document.getElementById("add-user-form").reset();
     loadUsers();
   } catch (err) {
-    console.error("Error al crear usuario:", err);
+    console.error("Error creando usuario:", err);
     alert("No fue posible crear el usuario.");
   }
 }
 
-// Cargar usuarios en tabla
+// Cargar lista de usuarios
 async function loadUsers() {
   const tbody = document.getElementById("users-table-body");
   tbody.innerHTML = "";
 
   try {
     const snap = await getDocs(collection(db, "users"));
-    let idx = 1;
+    let i = 1;
     snap.forEach(docSnap => {
-      const u = docSnap.data();
+      const user = docSnap.data();
       tbody.innerHTML += `
         <tr>
-          <td>${idx++}</td>
-          <td>${u.name}</td>
-          <td>${u.role}</td>
-          <td>${u.email}</td>
-          <td>${u.phone}</td>
-        </tr>`;
+          <td>${i++}</td>
+          <td>${user.name}</td>
+          <td>${user.role}</td>
+          <td>${user.email}</td>
+          <td>${user.phone}</td>
+        </tr>
+      `;
     });
   } catch (err) {
     console.error("Error al cargar usuarios:", err);
   }
 }
 
-// Manejo de pestañas
-function switchTab(tab) {
-  document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-  document.getElementById(`${tab}-tab`).style.display = 'block';
-  document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
-  document.querySelector(`.tabs button[data-tab="${tab}"]`).classList.add('active');
-}
-
+// Activar pestañas y eventos
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("add-user-form")?.addEventListener("submit", addUser);
   document.getElementById("add-object-form")?.addEventListener("submit", addObject);
-  document.querySelectorAll('.tabs button').forEach(btn =>
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab))
-  );
-  switchTab("user");
+  document.querySelectorAll(".tabs button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+      document.getElementById(`${tab}-tab`).classList.add("active");
+      btn.classList.add("active");
+    });
+  });
 });
 
-// Exponer funciones en el scope global
-window.addUser      = addUser;
-window.addObject    = addObject;
-window.loadUsers    = loadUsers;
-window.loadObjects  = loadObjects;
+// Exponer funciones globalmente
 window.deleteObject = deleteObject;

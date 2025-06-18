@@ -2,246 +2,223 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestión de Usuarios y Objetos Perdidos</title>
-  <!-- Tu CSS global -->
   <link rel="stylesheet" href="../styles.css" />
-
-  <!-- 1) SDK modular de Firebase + config -->
-  <script type="module">
-    import { initializeApp }           from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-    import { getAuth }                 from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
-    import { getFirestore }            from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-    import { getStorage }              from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBrh5AP2ErXaQcZbDNMHPq_5cBrvNZI1lW0",
-      authDomain: "objetosperdidos-76abd.firebaseapp.com",
-      projectId: "objetosperdidos-76abd",
-      storageBucket: "objetosperdidos-76abd.appspot.com",
-      messagingSenderId: "609690831592",
-      appId: "1:609690831592:web:f7a276b069c426ef53175d",
-      measurementId: "G-95C30B5EK1"
-    };
-
-    // Inicialización
-    const app     = initializeApp(firebaseConfig);
-    const auth    = getAuth(app);
-    const db      = getFirestore(app);
-    const storage = getStorage(app);
-
-    // Los objetos auth, db y storage estarán disponibles globalmente
-  </script>
-
-  <!-- 2) Variables y estilos específicos de esta página -->
   <style>
     :root {
       --verde-principal: #2e9d57;
-      --verde-claro:    #7dd081;
       --amarillo-abeja: #f9d94e;
-      --azul-oscuro:    #2b4f97;
+      --verde-claro:    #7dd081;
       --negro:          #1a1a1a;
       --blanco:         #fefefe;
     }
-
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: var(--negro);
       background: #f5f5f5;
+      color: var(--negro);
     }
-
     header {
-      position: relative;
+      background: var(--verde-principal);
+      color: var(--blanco);
       padding: 1rem;
       text-align: center;
-      background-color: var(--verde-principal);
-      color: var(--blanco);
+      position: relative;
     }
-
     .logout-button {
       position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background-color: #d9534f;
+      top: 1rem; right: 1rem;
+      background: #d9534f;
       color: #fff;
       border: none;
       padding: 0.5rem 1rem;
       border-radius: 5px;
       cursor: pointer;
     }
-    .logout-button:hover {
-      background-color: #c9302c;
-    }
-
+    .logout-button:hover { background: #c9302c; }
     .tabs {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      margin: 2rem 0;
+      gap: 0.5rem;
+      margin: 2rem 1rem 1rem;
     }
     .tabs button {
-      padding: 1rem 2rem;
-      margin: 0 0.5rem;
-      border: none;
-      border-radius: 5px;
-      background-color: var(--amarillo-abeja);
+      flex: 1 1 150px;
+      padding: 1rem;
+      background: var(--amarillo-abeja);
       color: var(--blanco);
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+      border: none; border-radius: 5px;
+      font-weight: bold; cursor: pointer;
+      transition: background 0.3s;
     }
-    .tabs button.active {
-      background-color: var(--verde-claro);
+    .tabs button.active { background: var(--verde-claro); }
+    main {
+      max-width: 960px;
+      margin: 0 auto 2rem;
+      padding: 0 1rem;
     }
-
     section {
       display: none;
-      max-width: 800px;
-      margin: 0 auto 2rem;
       background: #fff;
       padding: 1.5rem;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
     }
-    section.active {
-      display: block;
-    }
-
+    section.active { display: block; }
     form {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 1rem;
     }
     form label {
       font-weight: bold;
+      display: block;
+      margin-bottom: 0.25rem;
     }
-    form input,
-    form select,
-    form textarea,
-    form button {
+    form input, form select, form textarea {
+      width: 100%;
       padding: 0.5rem;
       font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
     form button {
-      background-color: var(--amarillo-abeja);
+      grid-column: span 2;
+      padding: 0.75rem;
+      background: var(--amarillo-abeja);
       color: var(--blanco);
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+      border: none; border-radius: 5px;
+      font-weight: bold; cursor: pointer;
+      transition: background 0.3s;
     }
-    form button:hover {
-      background-color: var(--verde-claro);
+    form button:hover { background: var(--verde-claro); }
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 1.5rem;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1.5rem;
+      min-width: 600px;
     }
-    table th,
-    table td {
-      border: 1px solid #ddd;
+    th, td {
       padding: 0.75rem;
+      border: 1px solid #ddd;
       text-align: left;
     }
-    table th {
-      background-color: var(--amarillo-abeja);
+    th {
+      background: var(--amarillo-abeja);
       color: var(--blanco);
     }
-    #objects-table-body img {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 4px;
+    td img {
+      width: 50px; height: 50px;
+      object-fit: cover; border-radius: 4px;
+    }
+    @media (max-width: 700px) {
+      form { grid-template-columns: 1fr; }
+      form button { grid-column: span 1; }
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Gestión de Usuarios y Objetos Perdidos</h1>
-    <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+    <button id="logout-button" class="logout-button" aria-label="Cerrar sesión">Cerrar Sesión</button>
   </header>
 
   <main>
     <div class="tabs">
-      <button data-tab="user"   class="active">Agregar Usuario</button>
+      <button data-tab="user" class="active">Agregar Usuario</button>
       <button data-tab="object">Agregar Objeto</button>
     </div>
 
-    <!-- Usuarios -->
     <section id="user-tab" class="active">
       <h2>Agregar Usuario</h2>
       <form id="add-user-form">
-        <label for="user-name">Nombre:</label>
-        <input type="text" id="user-name" required />
-
-        <label for="user-role">Rol:</label>
-        <select id="user-role" required>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-
-        <label for="user-email">Correo Electrónico:</label>
-        <input type="email" id="user-email" required />
-
-        <label for="user-phone">Teléfono:</label>
-        <input type="tel" id="user-phone" required />
-
-        <label for="user-password">Contraseña:</label>
-        <input type="password" id="user-password" required />
-
-        <label for="confirm-password">Confirmar Contraseña:</label>
-        <input type="password" id="confirm-password" required />
-
+        <div>
+          <label for="user-name">Nombre</label>
+          <input type="text" id="user-name" required />
+        </div>
+        <div>
+          <label for="user-role">Rol</label>
+          <select id="user-role" required>
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div>
+          <label for="user-email">Correo Electrónico</label>
+          <input type="email" id="user-email" required />
+        </div>
+        <div>
+          <label for="user-phone">Teléfono</label>
+          <input type="tel" id="user-phone" required />
+        </div>
+        <div>
+          <label for="user-password">Contraseña</label>
+          <input type="password" id="user-password" required />
+        </div>
+        <div>
+          <label for="confirm-password">Confirmar Contraseña</label>
+          <input type="password" id="confirm-password" required />
+        </div>
         <button type="submit">Agregar Usuario</button>
       </form>
-
       <h3>Usuarios Existentes</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th>
-          </tr>
-        </thead>
-        <tbody id="users-table-body"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th></tr>
+          </thead>
+          <tbody id="users-table-body"></tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- Objetos Perdidos -->
     <section id="object-tab">
       <h2>Agregar Objeto Perdido</h2>
       <form id="add-object-form" enctype="multipart/form-data">
-        <label for="object-name">Nombre del Objeto:</label>
-        <input type="text" id="object-name" required />
-
-        <label for="object-date">Fecha de Recuperación:</label>
-        <input type="date" id="object-date" required />
-
-        <label for="object-description">Descripción:</label>
-        <textarea id="object-description" rows="3" required></textarea>
-
-        <label for="object-location">Lugar de Encuentro:</label>
-        <input type="text" id="object-location" required />
-
-        <label for="object-image">Imagen del Objeto:</label>
-        <input type="file" id="object-image" accept="image/*" />
-
+        <div>
+          <label for="object-name">Nombre del Objeto</label>
+          <input type="text" id="object-name" required />
+        </div>
+        <div>
+          <label for="object-date">Fecha de Recuperación</label>
+          <input type="date" id="object-date" required />
+        </div>
+        <div>
+          <label for="object-description">Descripción</label>
+          <textarea id="object-description" rows="3" required></textarea>
+        </div>
+        <div>
+          <label for="object-location">Lugar de Encuentro</label>
+          <input type="text" id="object-location" required />
+        </div>
+        <div>
+          <label for="object-image">Imagen del Objeto</label>
+          <input type="file" id="object-image" accept="image/*" />
+        </div>
         <button type="submit">Agregar Objeto</button>
       </form>
-
       <h3>Objetos Existentes</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Nombre</th><th>Fecha</th>
-            <th>Descripción</th><th>Lugar</th><th>Imagen</th><th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="objects-table-body"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Nombre</th><th>Fecha</th>
+              <th>Descripción</th><th>Lugar</th>
+              <th>Imagen</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="objects-table-body"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
@@ -249,29 +226,177 @@
     <p>&copy; 2025 Objetos Perdidos. Todos los derechos reservados.</p>
   </footer>
 
-  <!-- 3) Tu lógica de usuarios y objetos, ahora como módulo y SIN la barra inicial -->
-  <script type="module" src="script.js"></script>
+  <script type="module">
+    import { initializeApp }               from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      addDoc,
+      getDocs,
+      getDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-  <!-- 4) Logout y manejo de pestañas -->
-  <script>
-    // Logout
-    document.getElementById("logout-button").addEventListener("click", async () => {
-      const { signOut } = await import("https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js");
-      await signOut(auth);
-      alert("Sesión cerrada correctamente.");
-      window.location.href = "../store/admin.html";
-    });
+    // Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
+      authDomain: "objetosperdidos-76abd.firebaseapp.com",
+      projectId: "objetosperdidos-76abd",
+      storageBucket: "objetosperdidos-76abd.appspot.com",
+      messagingSenderId: "609690831592",
+      appId: "1:609690831592:web:f7a276b069c426ef53175d",
+      measurementId: "G-95C30B5EK1"
+    };
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
 
-    // Pestañas
-    function switchTab(tab) {
+    // Configuración Cloudinary
+    const cloudName    = "dplgx0sze";
+    const uploadPreset = "ObjetosPerdidos";
+
+    async function uploadToCloudinary(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+      const resp = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+        { method: "POST", body: formData }
+      );
+      const json = await resp.json();
+      if (!resp.ok) {
+        console.error("Cloudinary error:", json);
+        throw new Error(json.error?.message || "Error subiendo a Cloudinary");
+      }
+      return json.secure_url;
+    }
+
+    // UI: pestañas, logout
+    window.switchTab = tab => {
       document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
       document.getElementById(`${tab}-tab`).classList.add("active");
       document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
       document.querySelector(`.tabs button[data-tab="${tab}"]`).classList.add("active");
-    }
-    document.querySelectorAll(".tabs button").forEach(btn => {
-      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    };
+    document.querySelectorAll(".tabs button")
+      .forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+    document.getElementById("logout-button")
+      .addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "../store/admin.html";
+      });
+
+    // Autenticación y carga inicial
+    onAuthStateChanged(auth, async user => {
+      if (!user) return window.location.href = "../store/admin.html";
+      const snap = await getDoc(doc(db, "users", user.uid));
+      const role = snap.exists() ? snap.data().role : null;
+      if (role !== "admin") {
+        document.querySelector('.tabs button[data-tab="user"]').style.display = "none";
+        switchTab("object");
+      }
+      loadUsers();
+      loadObjects();
     });
+
+    // Carga Usuarios
+    async function loadUsers() {
+      const tbody = document.getElementById("users-table-body");
+      tbody.innerHTML = "";
+      let i = 1;
+      const snap = await getDocs(collection(db, "users"));
+      snap.forEach(d => {
+        const u = d.data();
+        tbody.innerHTML += `
+          <tr>
+            <td>${i++}</td><td>${u.name}</td><td>${u.role}</td>
+            <td>${u.email}</td><td>${u.phone}</td>
+          </tr>`;
+      });
+    }
+    // Alta Usuario
+    document.getElementById("add-user-form")
+      .addEventListener("submit", async e => {
+        e.preventDefault();
+        const f     = e.target;
+        const name  = f["user-name"].value.trim();
+        const role  = f["user-role"].value;
+        const email = f["user-email"].value.trim();
+        const phone = f["user-phone"].value.trim();
+        const pwd   = f["user-password"].value;
+        const pwd2  = f["confirm-password"].value;
+        if (!name||!role||!email||!phone||!pwd||!pwd2) return alert("Todos los campos son obligatorios.");
+        if (pwd !== pwd2) return alert("Las contraseñas no coinciden.");
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+          await setDoc(doc(db, "users", cred.user.uid), {
+            uid: cred.user.uid, name, role, email, phone, createdAt: serverTimestamp()
+          });
+          f.reset();
+          loadUsers();
+        } catch (err) {
+          console.error(err);
+          alert("Error creando usuario: " + err.code);
+        }
+      });
+
+    // Carga Objetos
+    async function loadObjects() {
+      const tbody = document.getElementById("objects-table-body");
+      tbody.innerHTML = "";
+      let i = 1;
+      const snap = await getDocs(collection(db, "objects"));
+      snap.forEach(d => {
+        const o = d.data();
+        tbody.innerHTML += `
+          <tr>
+            <td>${i++}</td><td>${o.name}</td><td>${o.date}</td>
+            <td>${o.description}</td><td>${o.location}</td>
+            <td>${o.imageUrl?`<img src="${o.imageUrl}" alt="${o.name}">`:'—'}</td>
+            <td></td>
+          </tr>`;
+      });
+    }
+    // Alta Objeto
+    document.getElementById("add-object-form")
+      .addEventListener("submit", async e => {
+        e.preventDefault();
+        const f           = e.target;
+        const name        = f["object-name"].value.trim();
+        const date        = f["object-date"].value;
+        const description = f["object-description"].value.trim();
+        const location    = f["object-location"].value.trim();
+        const fileInput   = f["object-image"];
+        let   imageUrl    = "";
+        if (!name||!date||!description||!location) {
+          return alert("Todos los campos excepto la imagen son obligatorios.");
+        }
+        if (fileInput.files.length) {
+          try {
+            imageUrl = await uploadToCloudinary(fileInput.files[0]);
+          } catch (err) {
+            return alert("Error al subir imagen: " + err.message);
+          }
+        }
+        try {
+          await addDoc(collection(db, "objects"), {
+            name, date, description, location, imageUrl, createdAt: serverTimestamp()
+          });
+          f.reset();
+          loadObjects();
+        } catch (err) {
+          console.error(err);
+          alert("Error agregando objeto: " + err.code);
+        }
+      });
   </script>
 </body>
 </html>
