@@ -133,8 +133,7 @@
     <nav class="navbar">
       <ul>
         <li><a href="../index.html">Inicio</a></li>
-        <li><a href="productos.html">Objetos</a></li>
-        <li><a href="carrito.html">Carrito</a></li>
+        <li><a href="carrito.html">Formulario</a></li>
         <li><a href="admin.html">Administrador</a></li>
       </ul>
     </nav>
@@ -150,7 +149,7 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 Hacienda la Violeta. Todos los derechos reservados.</p>
+    <p>&copy; 2025 Infraestructura y Planta Física.</p>
   </footer>
 
   <script>
@@ -161,14 +160,11 @@
   </script>
 
   <script type="module">
-    import { initializeApp }
-      from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
     import {
       getFirestore,
       collection,
-      getDocs,
-      query,
-      orderBy
+      getDocs
     } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -187,25 +183,45 @@
     async function cargarObjetos() {
       const cont = document.getElementById("productos-lista");
       cont.innerHTML = "";
+
       try {
-        const q    = query(collection(db, "objects"), orderBy("createdAt", "desc"));
-        const snap = await getDocs(q);
-        if (snap.empty) {
-          cont.innerHTML = "<p>No hay objetos registrados.</p>";
+        const snap = await getDocs(collection(db, "objects"));
+        const lista = [];
+        snap.forEach(docSnap => {
+          const o = docSnap.data();
+          // filtrar únicamente status "por entregar"
+          if (o.status === "por entregar") {
+            lista.push({ id: docSnap.id, ...o });
+          }
+        });
+
+        if (lista.length === 0) {
+          cont.innerHTML = "<p>No hay objetos por entregar.</p>";
           return;
         }
-        snap.forEach(doc => {
-          const o = doc.data();
-          const nameEncoded = encodeURIComponent(o.name);
+
+        // ordenar de más reciente a más antiguo
+        lista.sort((a, b) => {
+          const ta = a.createdAt?.toDate?.() || 0;
+          const tb = b.createdAt?.toDate?.() || 0;
+          return tb - ta;
+        });
+
+        // renderizar tarjetas
+        lista.forEach(o => {
+          const nameEnc = encodeURIComponent(o.name);
           cont.innerHTML += `
             <div class="producto">
-              <img src="${o.imageUrl || 'https://via.placeholder.com/300'}" alt="${o.name}" />
+              <img src="${o.imageUrl || 'https://via.placeholder.com/300'}"
+                   alt="${o.name}" />
               <h3>${o.name}</h3>
-              <p><strong>Fecha registro:</strong> ${o.createdAt?.toDate().toLocaleString("es-CO") || ""}</p>
+              <p><strong>Fecha registro:</strong>
+                ${o.createdAt?.toDate().toLocaleString("es-CO") || ""}
+              </p>
               <p><strong>Descripción:</strong> ${o.description}</p>
               <p><strong>Lugar:</strong> ${o.location}</p>
               <button class="reclamar-btn"
-                      onclick="location.href='carrito.html?id=${doc.id}&name=${nameEncoded}'">
+                onclick="location.href='carrito.html?id=${o.id}&name=${nameEnc}'">
                 Reclamar
               </button>
             </div>`;

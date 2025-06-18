@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestión de Usuarios y Objetos Perdidos</title>
   <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
   <style>
     :root {
       --verde-principal: #2e9d57;
@@ -29,87 +31,105 @@
       text-align: center;
       position: relative;
     }
-    .logout-button {
-      position: absolute;
-      top: 1rem; right: 1rem;
-      background: #d9534f;
-      color: #fff;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
+    .logo {
+      position: absolute; left: 1rem; top: 1rem;
+    }
+    .logo img {
+      width: 120px; height: auto;
+    }
+    .main-title {
+      width: 100%; font-size: 2rem; margin-top: .5rem;
+    }
+    .burger {
+      display: none;
+      position: absolute; right: 1rem; top: 1rem;
+      font-size: 1.8rem; color: var(--amarillo-abeja);
       cursor: pointer;
     }
-    .logout-button:hover { background: #c9302c; }
+    .navbar {
+      width: 100%; margin-top: .5rem;
+    }
+    .navbar ul {
+      display: flex; justify-content: center;
+      flex-wrap: wrap; gap: 1rem; list-style: none;
+    }
+    .navbar a {
+      color: var(--blanco); font-weight: bold;
+      text-decoration: none; transition: .3s;
+    }
+    .navbar a:hover {
+      color: var(--amarillo-abeja);
+    }
+    .logout-button {
+      position: absolute; top: 1rem; right: 1rem;
+      background: #d9534f; color: #fff; border: none;
+      padding: .5rem 1rem; border-radius: 5px;
+      cursor: pointer;
+    }
+    .logout-button:hover {
+      background: #c9302c;
+    }
     .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: .5rem;
       margin: 2rem 1rem 1rem;
     }
     .tabs button {
-      flex: 1 1 150px;
-      padding: 1rem;
-      background: var(--amarillo-abeja);
-      color: var(--blanco);
+      flex: 1 1 150px; padding: 1rem;
+      background: var(--amarillo-abeja); color: var(--blanco);
       border: none; border-radius: 5px;
       font-weight: bold; cursor: pointer;
-      transition: background 0.3s;
+      transition: background .3s;
     }
-    .tabs button.active { background: var(--verde-claro); }
+    .tabs button.active {
+      background: var(--verde-claro);
+    }
     main {
-      max-width: 960px;
-      margin: 0 auto 2rem;
+      max-width: 960px; margin: 0 auto 2rem;
       padding: 0 1rem;
     }
     section {
-      display: none;
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 8px;
+      display: none; background: #fff;
+      padding: 1.5rem; border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
     }
-    section.active { display: block; }
+    section.active {
+      display: block;
+    }
     form {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
     }
     form label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 0.25rem;
+      font-weight: bold; display: block;
+      margin-bottom: .25rem;
     }
     form input, form select, form textarea {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
+      width: 100%; padding: .5rem;
+      font-size: 1rem; border: 1px solid #ccc;
       border-radius: 4px;
     }
     form button {
-      grid-column: span 2;
-      padding: 0.75rem;
+      grid-column: span 2; padding: .75rem;
       background: var(--amarillo-abeja);
-      color: var(--blanco);
-      border: none; border-radius: 5px;
-      font-weight: bold; cursor: pointer;
-      transition: background 0.3s;
+      color: var(--blanco); border: none;
+      border-radius: 5px; font-weight: bold;
+      cursor: pointer; transition: background .3s;
     }
-    form button:hover { background: var(--verde-claro); }
+    form button:hover {
+      background: var(--verde-claro);
+    }
     .table-wrapper {
-      overflow-x: auto;
-      margin-top: 1.5rem;
+      overflow-x: auto; margin-top: 1.5rem;
     }
     table {
-      width: 100%;
-      border-collapse: collapse;
+      width: 100%; border-collapse: collapse;
       min-width: 600px;
     }
     th, td {
-      padding: 0.75rem;
-      border: 1px solid #ddd;
+      padding: .75rem; border: 1px solid #ddd;
       text-align: left;
     }
     th {
@@ -120,16 +140,48 @@
       width: 50px; height: 50px;
       object-fit: cover; border-radius: 4px;
     }
-    @media (max-width: 700px) {
-      form { grid-template-columns: 1fr; }
-      form button { grid-column: span 1; }
+    td select.status-select {
+      width: 100%;
+      padding: .25rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    td button.save-btn {
+      padding: .5rem 1rem;
+      background: var(--verde-principal);
+      color: var(--blanco);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    td button.save-btn:hover {
+      background: var(--verde-claro);
+    }
+    @media(max-width:768px){
+      .burger { display:block; }
+      .navbar ul { display:none; flex-direction:column; background:var(--verde-principal); }
+      .navbar ul.active { display:flex; }
+      header { flex-direction:column; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Gestión de Usuarios y Objetos Perdidos</h1>
-    <button id="logout-button" class="logout-button" aria-label="Cerrar sesión">Cerrar Sesión</button>
+    <div class="logo">
+      <img src="img/logto wilferson.png" alt="Logo" />
+    </div>
+    <h1 class="main-title">GESTIÓN DE USUARIOS Y OBJETOS PERDIDOS</h1>
+    <div class="burger"><i class="fas fa-bars"></i></div>
+    <nav class="navbar">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+        <li><a href="productos.html">Objetos</a></li>
+        <li><a href="carrito.html">Carrito</a></li>
+      </ul>
+    </nav>
+    <button id="logout-button" class="logout-button" aria-label="Cerrar sesión">
+      Cerrar Sesión
+    </button>
   </header>
 
   <main>
@@ -138,6 +190,7 @@
       <button data-tab="object">Agregar Objeto</button>
     </div>
 
+    <!-- Sección Agregar Usuario -->
     <section id="user-tab" class="active">
       <h2>Agregar Usuario</h2>
       <form id="add-user-form">
@@ -170,17 +223,22 @@
         </div>
         <button type="submit">Agregar Usuario</button>
       </form>
+
       <h3>Usuarios Existentes</h3>
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr><th>#</th><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th></tr>
+            <tr>
+              <th>#</th><th>Nombre</th><th>Rol</th>
+              <th>Correo</th><th>Teléfono</th>
+            </tr>
           </thead>
           <tbody id="users-table-body"></tbody>
         </table>
       </div>
     </section>
 
+    <!-- Sección Agregar Objeto -->
     <section id="object-tab">
       <h2>Agregar Objeto Perdido</h2>
       <form id="add-object-form" enctype="multipart/form-data">
@@ -206,6 +264,7 @@
         </div>
         <button type="submit">Agregar Objeto</button>
       </form>
+
       <h3>Objetos Existentes</h3>
       <div class="table-wrapper">
         <table>
@@ -213,7 +272,7 @@
             <tr>
               <th>#</th><th>Nombre</th><th>Fecha</th>
               <th>Descripción</th><th>Lugar</th>
-              <th>Imagen</th><th>Acciones</th>
+              <th>Imagen</th><th>Estado</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody id="objects-table-body"></tbody>
@@ -230,6 +289,8 @@
     import { initializeApp }               from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
       getAuth,
+      setPersistence,
+      browserLocalPersistence,
       onAuthStateChanged,
       createUserWithEmailAndPassword,
       signOut
@@ -242,6 +303,7 @@
       addDoc,
       getDocs,
       getDoc,
+      updateDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
@@ -257,6 +319,8 @@
     };
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    // Mantener sesión entre recargas
+    await setPersistence(auth, browserLocalPersistence);
     const db   = getFirestore(app);
 
     // Configuración Cloudinary
@@ -279,7 +343,7 @@
       return json.secure_url;
     }
 
-    // UI: pestañas, logout
+    // UI: pestañas y logout
     window.switchTab = tab => {
       document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
       document.getElementById(`${tab}-tab`).classList.add("active");
@@ -294,7 +358,7 @@
         window.location.href = "../store/admin.html";
       });
 
-    // Autenticación y carga inicial
+    // Control de auth y carga inicial
     onAuthStateChanged(auth, async user => {
       if (!user) return window.location.href = "../store/admin.html";
       const snap = await getDoc(doc(db, "users", user.uid));
@@ -322,6 +386,7 @@
           </tr>`;
       });
     }
+
     // Alta Usuario
     document.getElementById("add-user-form")
       .addEventListener("submit", async e => {
@@ -333,12 +398,16 @@
         const phone = f["user-phone"].value.trim();
         const pwd   = f["user-password"].value;
         const pwd2  = f["confirm-password"].value;
-        if (!name||!role||!email||!phone||!pwd||!pwd2) return alert("Todos los campos son obligatorios.");
-        if (pwd !== pwd2) return alert("Las contraseñas no coinciden.");
+        if (!name||!role||!email||!phone||!pwd||!pwd2)
+          return alert("Todos los campos son obligatorios.");
+        if (pwd !== pwd2)
+          return alert("Las contraseñas no coinciden.");
+
         try {
           const cred = await createUserWithEmailAndPassword(auth, email, pwd);
           await setDoc(doc(db, "users", cred.user.uid), {
-            uid: cred.user.uid, name, role, email, phone, createdAt: serverTimestamp()
+            uid: cred.user.uid, name, role, email, phone,
+            createdAt: serverTimestamp()
           });
           f.reset();
           loadUsers();
@@ -356,15 +425,45 @@
       const snap = await getDocs(collection(db, "objects"));
       snap.forEach(d => {
         const o = d.data();
+        const status = o.status || "por entregar";
         tbody.innerHTML += `
-          <tr>
-            <td>${i++}</td><td>${o.name}</td><td>${o.date}</td>
-            <td>${o.description}</td><td>${o.location}</td>
+          <tr data-id="${d.id}">
+            <td>${i++}</td>
+            <td>${o.name}</td>
+            <td>${o.date}</td>
+            <td>${o.description}</td>
+            <td>${o.location}</td>
             <td>${o.imageUrl?`<img src="${o.imageUrl}" alt="${o.name}">`:'—'}</td>
-            <td></td>
+            <td>
+              <select class="status-select">
+                <option value="por entregar" ${status==="por entregar"?'selected':''}>Por entregar</option>
+                <option value="entregado" ${status==="entregado"?'selected':''}>Entregado</option>
+                <option value="de baja" ${status==="de baja"?'selected':''}>De baja</option>
+              </select>
+            </td>
+            <td>
+              <button class="save-btn">Guardar</button>
+            </td>
           </tr>`;
       });
+      // Asignar listeners a Guardar
+      document.querySelectorAll("button.save-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const row = btn.closest("tr");
+          const id  = row.dataset.id;
+          const sel = row.querySelector("select.status-select");
+          const newStatus = sel.value;
+          // actualizar en Firestore
+          await updateDoc(doc(db, "objects", id), { status: newStatus });
+          // si entregado o de baja, quitar de la tabla
+          if (newStatus === "entregado" || newStatus === "de baja") {
+            row.remove();
+          }
+          alert("Estado actualizado a '" + newStatus + "'");
+        });
+      });
     }
+
     // Alta Objeto
     document.getElementById("add-object-form")
       .addEventListener("submit", async e => {
@@ -375,10 +474,11 @@
         const description = f["object-description"].value.trim();
         const location    = f["object-location"].value.trim();
         const fileInput   = f["object-image"];
-        let   imageUrl    = "";
-        if (!name||!date||!description||!location) {
+        let imageUrl      = "";
+
+        if (!name||!date||!description||!location)
           return alert("Todos los campos excepto la imagen son obligatorios.");
-        }
+
         if (fileInput.files.length) {
           try {
             imageUrl = await uploadToCloudinary(fileInput.files[0]);
@@ -386,9 +486,11 @@
             return alert("Error al subir imagen: " + err.message);
           }
         }
+
         try {
           await addDoc(collection(db, "objects"), {
-            name, date, description, location, imageUrl, createdAt: serverTimestamp()
+            name, date, description, location,
+            imageUrl, status: "por entregar", createdAt: serverTimestamp()
           });
           f.reset();
           loadObjects();
@@ -397,6 +499,7 @@
           alert("Error agregando objeto: " + err.code);
         }
       });
+
   </script>
 </body>
 </html>
