@@ -1,229 +1,277 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Usuarios y Productos</title>
-    <link rel="stylesheet" href="../styles.css">
-    <style>
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Usuarios y Objetos Perdidos</title>
+  <!-- Tu CSS global -->
+  <link rel="stylesheet" href="../styles.css" />
 
-        .tabs button {
-            padding: 1rem;
-            margin: 0 1rem;
-            cursor: pointer;
-            background-color: #f4c542;
-            border: none;
-            color: #fff;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 5px;
-        }
+  <!-- 1) SDK modular de Firebase + config -->
+  <script type="module">
+    import { initializeApp }           from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import { getAuth }                 from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+    import { getFirestore }            from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+    import { getStorage }              from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
 
-        .tabs button.active {
-            background-color: #d4a12f;
-        }
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrh5AP2ErXaQcZbDNMHPq_5cBrvNZI1lW0",
+      authDomain: "objetosperdidos-76abd.firebaseapp.com",
+      projectId: "objetosperdidos-76abd",
+      storageBucket: "objetosperdidos-76abd.appspot.com",
+      messagingSenderId: "609690831592",
+      appId: "1:609690831592:web:f7a276b069c426ef53175d",
+      measurementId: "G-95C30B5EK1"
+    };
 
-        form {
-            display: flex;
-            flex-direction: column;
-            max-width: 400px;
-            margin: 0 auto;
-        }
+    // Inicialización
+    const app     = initializeApp(firebaseConfig);
+    const auth    = getAuth(app);
+    const db      = getFirestore(app);
+    const storage = getStorage(app);
 
-        form label {
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-        }
+    // Los objetos auth, db y storage estarán disponibles globalmente
+  </script>
 
-        form input, form select, form button {
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            font-size: 1rem;
-        }
+  <!-- 2) Variables y estilos específicos de esta página -->
+  <style>
+    :root {
+      --verde-principal: #2e9d57;
+      --verde-claro:    #7dd081;
+      --amarillo-abeja: #f9d94e;
+      --azul-oscuro:    #2b4f97;
+      --negro:          #1a1a1a;
+      --blanco:         #fefefe;
+    }
 
-        form button {
-            background-color: #f4c542;
-            border: none;
-            color: #fff;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--negro);
+      background: #f5f5f5;
+    }
 
-        form button:hover {
-            background-color: #d4a12f;
-        }
+    header {
+      position: relative;
+      padding: 1rem;
+      text-align: center;
+      background-color: var(--verde-principal);
+      color: var(--blanco);
+    }
 
-        section {
-            display: none;
-        }
+    .logout-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background-color: #d9534f;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .logout-button:hover {
+      background-color: #c9302c;
+    }
 
-        section.active {
-            display: block;
-        }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+    .tabs button {
+      padding: 1rem 2rem;
+      margin: 0 0.5rem;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--amarillo-abeja);
+      color: var(--blanco);
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .tabs button.active {
+      background-color: var(--verde-claro);
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 2rem 0;
-        }
+    section {
+      display: none;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    section.active {
+      display: block;
+    }
 
-        table th, table td {
-            border: 1px solid #ddd;
-            text-align: left;
-            padding: 0.5rem;
-        }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    form label {
+      font-weight: bold;
+    }
+    form input,
+    form select,
+    form textarea,
+    form button {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    form button {
+      background-color: var(--amarillo-abeja);
+      color: var(--blanco);
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    form button:hover {
+      background-color: var(--verde-claro);
+    }
 
-        table th {
-            background-color: #f4c542;
-            color: #fff;
-        }
-
-        #products-table-body img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover; /* Asegura que la imagen se recorte proporcionalmente */
-    display: block;
-    margin: auto; /* Centra la imagen en la celda */
-    border-radius: 5px; /* Opcional: bordes redondeados */
-}
-
-
-        .logout-button {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background-color: #d9534f;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .logout-button:hover {
-            background-color: #c9302c;
-        }
-    </style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+    table th,
+    table td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    table th {
+      background-color: var(--amarillo-abeja);
+      color: var(--blanco);
+    }
+    #objects-table-body img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Gestión de Usuarios y Productos</h1>
-        <button class="logout-button" id="logout-button">Cerrar Sesión</button>
-    </header>
+  <header>
+    <h1>Gestión de Usuarios y Objetos Perdidos</h1>
+    <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+  </header>
 
-    <main>
-        <div class="tabs">
-            <button data-tab="user" class="active">Agregar Usuario</button>
-            <button data-tab="product">Agregar Producto</button>
-        </div>
+  <main>
+    <div class="tabs">
+      <button data-tab="user"   class="active">Agregar Usuario</button>
+      <button data-tab="object">Agregar Objeto</button>
+    </div>
 
-        <section id="user-tab" class="active">
-            <h2>Agregar Usuario</h2>
-            <form id="add-user-form">
-                <label for="user-name">Nombre:</label>
-                <input type="text" id="user-name" required>
+    <!-- Usuarios -->
+    <section id="user-tab" class="active">
+      <h2>Agregar Usuario</h2>
+      <form id="add-user-form">
+        <label for="user-name">Nombre:</label>
+        <input type="text" id="user-name" required />
 
-                <label for="user-email">Correo Electrónico:</label>
-                <input type="email" id="user-email" required>
+        <label for="user-role">Rol:</label>
+        <select id="user-role" required>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
 
-                <label for="user-phone">Teléfono:</label>
-                <input type="tel" id="user-phone" required>
+        <label for="user-email">Correo Electrónico:</label>
+        <input type="email" id="user-email" required />
 
-                <label for="user-password">Contraseña:</label>
-                <input type="password" id="user-password" required>
+        <label for="user-phone">Teléfono:</label>
+        <input type="tel" id="user-phone" required />
 
-                <label for="confirm-password">Confirmar Contraseña:</label>
-                <input type="password" id="confirm-password" required>
+        <label for="user-password">Contraseña:</label>
+        <input type="password" id="user-password" required />
 
-                <button type="submit">Agregar Usuario</button>
-            </form>
+        <label for="confirm-password">Confirmar Contraseña:</label>
+        <input type="password" id="confirm-password" required />
 
-            <h3>Usuarios Existentes</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Teléfono</th>
-                    </tr>
-                </thead>
-                <tbody id="users-table-body"></tbody>
-            </table>
-        </section>
+        <button type="submit">Agregar Usuario</button>
+      </form>
 
-        <section id="product-tab">
-            <h2>Agregar Producto</h2>
-            <form id="add-product-form">
-                <label for="product-name">Nombre del Producto:</label>
-                <input type="text" id="product-name" required>
-            
-                <label for="product-description">Descripción:</label>
-                <input type="text" id="product-description" required>
-            
-                <label for="product-weight-unit">Unidad de Peso:</label>
-                <select id="product-weight-unit" required>
-                    <option value="gramos">Gramos</option>
-                    <option value="libras">Libras</option>
-                    <option value="kilo">Kilo</option>
-                </select>
-            
-                <label for="product-weight-value">Cantidad (Peso):</label>
-                <input type="number" id="product-weight-value" required>
-            
-                <label for="product-price">Precio:</label>
-                <input type="number" id="product-price" required>
-            
-                <label for="product-quantity">Cantidad Disponible:</label>
-                <input type="number" id="product-quantity" required>
-            
-                <label for="product-image">Imagen del Producto:</label>
-                <input type="file" id="product-image" accept="image/*">
-            
-                <button type="submit">Agregar Producto</button>
-            </form>
-            
-            
-            <h3>Productos Existentes</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Peso</th>
-                        <th>Precio</th>
-                        <th>Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody id="products-table-body"></tbody>
-            </table>
-        </section>
-    </main>
+      <h3>Usuarios Existentes</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body"></tbody>
+      </table>
+    </section>
 
-    <footer>
-        <p>&copy; 2025 Tienda en Línea. Todos los derechos reservados.</p>
-    </footer>
+    <!-- Objetos Perdidos -->
+    <section id="object-tab">
+      <h2>Agregar Objeto Perdido</h2>
+      <form id="add-object-form" enctype="multipart/form-data">
+        <label for="object-name">Nombre del Objeto:</label>
+        <input type="text" id="object-name" required />
 
-    <script src="/users/script.js" type="module"></script>
-    <script>
-        document.getElementById("logout-button").addEventListener("click", async () => {
-            try {
-                const auth = await import("https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js");
-                const { getAuth, signOut } = auth;
-                const authInstance = getAuth();
-                await signOut(authInstance);
-                alert("Sesión cerrada correctamente.");
-                window.location.href = "/store/admin.html";
-            } catch (error) {
-                console.error("Error al cerrar sesión:", error);
-                alert("No se pudo cerrar sesión. Inténtalo de nuevo.");
-            }
-        });
-    </script>
+        <label for="object-date">Fecha de Recuperación:</label>
+        <input type="date" id="object-date" required />
+
+        <label for="object-description">Descripción:</label>
+        <textarea id="object-description" rows="3" required></textarea>
+
+        <label for="object-location">Lugar de Encuentro:</label>
+        <input type="text" id="object-location" required />
+
+        <label for="object-image">Imagen del Objeto:</label>
+        <input type="file" id="object-image" accept="image/*" />
+
+        <button type="submit">Agregar Objeto</button>
+      </form>
+
+      <h3>Objetos Existentes</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nombre</th><th>Fecha</th>
+            <th>Descripción</th><th>Lugar</th><th>Imagen</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="objects-table-body"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Objetos Perdidos. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- 3) Tu lógica de usuarios y objetos, ahora como módulo y SIN la barra inicial -->
+  <script type="module" src="script.js"></script>
+
+  <!-- 4) Logout y manejo de pestañas -->
+  <script>
+    // Logout
+    document.getElementById("logout-button").addEventListener("click", async () => {
+      const { signOut } = await import("https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js");
+      await signOut(auth);
+      alert("Sesión cerrada correctamente.");
+      window.location.href = "../store/admin.html";
+    });
+
+    // Pestañas
+    function switchTab(tab) {
+      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+      document.getElementById(`${tab}-tab`).classList.add("active");
+      document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+      document.querySelector(`.tabs button[data-tab="${tab}"]`).classList.add("active");
+    }
+    document.querySelectorAll(".tabs button").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
+  </script>
 </body>
 </html>

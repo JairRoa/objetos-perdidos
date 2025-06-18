@@ -1,9 +1,9 @@
 /* Paleta de colores inspirada en miel */
 :root {
-    --color-primario: #f4c542; /* Amarillo miel */
-    --color-secundario: #a56729; /* Marrón cálido */
-    --color-fondo: #fff7e6; /* Fondo suave */
-    --color-texto: #5c432a; /* Marrón oscuro */
+    --color-primario: #2e9d57; /* Amarillo miel */
+    --color-secundario: #2b4f97; /* Marrón cálido */
+    --color-fondo: ##7dd081; /* Fondo suave */
+    --color-texto: #fefefe; /* Marrón oscuro */
     --color-acento: #f9a825; /* Acentos amarillos */
 }
 

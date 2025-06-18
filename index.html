@@ -1,253 +1,302 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <title>Inicio - Hacienda La Violeta</title>
-    <link rel="stylesheet" href="styles.css">
-    
-    <!-- Librería de iconos Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Inicio - Objetos Perdidos</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+  />
 
+  <!-- 1) Firebase SDK (modular) + tu config -->
+  <script type="module">
+    import { initializeApp }               from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import { getAuth }                     from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+    import { getFirestore }                from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
-    <style>
-        /* Header */
-        header {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            padding: 1rem;
-            background-color: #f4c542;
-            position: relative;
-        }
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrh5AP2ErXaQcZbDNMHPq_5cBrvNZI1lW0",
+      authDomain: "objetosperdidos-76abd.firebaseapp.com",
+      projectId: "objetosperdidos-76abd",
+      storageBucket: "objetosperdidos-76abd.appspot.com",
+      messagingSenderId: "609690831592",
+      appId: "1:609690831592:web:f7a276b069c426ef53175d",
+      measurementId: "G-95C30B5EK1"
+    };
 
-        .logo {
-            display: flex;
-            align-items: center;
-            position: absolute;
-            left: 1rem;
-        }
+    // Inicializa Firebase
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
 
-        .logo img {
-            width: 80px;
-            height: 80px;
-        }
+    // aquí podrás poner tu lógica de login, lectura de Firestore, etc.
+  </script>
 
-        .main-title {
-            flex: 1;
-            text-align: center;
-            margin: 0;
-            font-size: 2rem;
-            color: #333;
-        }
+  <style>
+    :root {
+      --verde-principal: #2e9d57;
+      --verde-claro: #7dd081;
+      --amarillo-abeja: #f9d94e;
+      --azul-oscuro: #2b4f97;
+      --negro: #1a1a1a;
+      --blanco: #fefefe;
+    }
 
-        .navbar {
-            flex: 1 100%;
-            background-color: #f4c542;
-            padding: 0.5rem 0;
-        }
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
 
-        .navbar ul {
-            display: flex;
-            justify-content: center;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      color: var(--negro);
+      background: url("img/background.png") no-repeat center center fixed;
+      background-size: cover;
+    }
 
-        .navbar li {
-            margin: 0 1rem;
-        }
+    header {
+      background-color: var(--verde-principal);
+      padding: 1rem;
+      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
 
-        .navbar a {
-            text-decoration: none;
-            color: #fff;
-            font-weight: bold;
-        }
+    .logo {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+    }
 
-        main {
-            padding: 2rem;
-            text-align: center;
-        }
+    .logo img {
+      width: 120px;
+      height: auto;
+    }
 
-        /* Estilos del Slider */
-        .slider-container {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-            height: 250px;
-            margin: auto;
-            overflow: hidden;
-            border-radius: 10px;
-        }
+    .main-title {
+      width: 100%;
+      font-size: 2rem;
+      margin-top: 0.5rem;
+      color: var(--blanco);
+    }
 
-        .slider {
-            display: flex;
-            gap: 10px;
-            width: calc(200% + 50px);
-            animation: moverSlider 20s linear infinite;
-        }
+    .burger {
+      display: none;
+      font-size: 1.8rem;
+      color: var(--amarillo-abeja);
+      cursor: pointer;
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+    }
 
-        .slider img {
-            flex: 0 0 auto;
-            width: 220px;
-            height: 250px;
-            object-fit: contain;
-        }
+    .navbar {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
 
-        /* Animación de desplazamiento infinito */
-        @keyframes moverSlider {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+    .navbar ul {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+    }
 
-        /* Botón estilizado */
-        .btn-explorar {
-            display: inline-block;
-            padding: 12px 20px;
-            font-size: 18px;
-            color: white;
-            background-color: #d98c12;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-            margin-top: 20px;
-        }
+    .navbar a {
+      color: var(--blanco);
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+    }
 
-        .btn-explorar:hover {
-            background-color: #b2720b;
-            transform: scale(1.05);
-        }
+    .navbar a:hover {
+      color: var(--amarillo-abeja);
+    }
 
-        /* Sección Encuéntranos */
-        .encuentranos {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #f4c542;
-            border-radius: 10px;
-        }
+    main {
+      padding: 2rem;
+      text-align: center;
+    }
 
-        .encuentranos h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #333;
-        }
+    .img-perdidos {
+      display: block;
+      margin: 2rem auto;
+      width: 80%;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
 
-        .redes-sociales {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
+    .btn-explorar {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 18px;
+      background-color: var(--amarillo-abeja);
+      color: var(--negro);
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+    }
 
-        .redes-sociales a {
-            font-size: 30px;
-            color: white;
-            transition: 0.3s;
-        }
+    .btn-explorar:hover {
+      background-color: var(--verde-claro);
+      transform: scale(1.05);
+    }
 
-        .redes-sociales a:hover {
-            transform: scale(1.2);
-        }
+    .encuentranos {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: var(--amarillo-abeja);
+      border-radius: 10px;
+    }
 
-        /* Ajuste responsivo */
-        @media (max-width: 768px) {
-            .navbar ul {
-                flex-direction: column;
-                align-items: center;
-            }
+    .encuentranos h2 {
+      margin-bottom: 15px;
+      color: var(--azul-oscuro);
+      font-size: 24px;
+    }
 
-            .navbar li {
-                margin: 0.5rem 0;
-            }
+    .redes-sociales {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
 
-            .main-title {
-                font-size: 1.5rem;
-            }
+    .redes-sociales a {
+      font-size: 30px;
+      color: var(--azul-oscuro);
+      transition: 0.3s;
+    }
 
-            .slider-container {
-                height: 200px;
-                max-width: 100%;
-            }
+    .redes-sociales a:hover {
+      color: var(--verde-principal);
+      transform: scale(1.2);
+    }
 
-            .slider img {
-                width: 180px;
-                height: 200px;
-            }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: var(--verde-principal);
+      color: var(--blanco);
+    }
 
-            .redes-sociales a {
-                font-size: 24px;
-            }
-        }
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: center;
+        padding-top: 1rem;
+      }
 
-        @media (max-width: 480px) {
-            .slider-container {
-                height: 150px;
-            }
+      .logo {
+        position: static;
+        margin-bottom: 0.5rem;
+      }
 
-            .slider img {
-                width: 150px;
-                height: 150px;
-            }
-        }
-    </style>
+      .main-title {
+        font-size: 1.8rem;
+        margin-top: 0;
+      }
+
+      .burger {
+        display: block;
+        margin-top: 0.5rem;
+        position: static;
+        order: 2;
+      }
+
+      .navbar {
+        order: 3;
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
+      }
+
+      .navbar ul {
+        display: none;
+        flex-direction: column;
+        background-color: var(--verde-principal);
+        position: static;
+        width: 100%;
+        padding: 0.5rem 0;
+      }
+
+      .navbar ul.active {
+        display: flex;
+      }
+
+      .navbar li {
+        margin: 0.5rem 0;
+      }
+
+      .img-perdidos {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <header>
-        <div class="logo">
-            <img src="img/logto wilferson.png" alt="Hacienda la Violeta">
-        </div>
-        <h1 class="main-title">Hacienda La Violeta</h1>
-        <nav class="navbar">
-            <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="/store/productos.html">Productos</a></li>
-                <li><a href="/store/carrito.html">Carrito</a></li>
-                <li><a href="/store/admin.html">Administrador</a></li>
-            </ul>
-        </nav>
-    </header>
+  <header>
+    <div class="logo">
+      <img src="img/logto wilferson.png" alt="Logo" />
+    </div>
 
-    <main>
-        <h2>Bienvenido a Hacienda La Violeta</h2>
-        <p>Encuentra los mejores productos al mejor precio. Explora nuestras categorías y llena tu carrito.</p>
-        
-        <!-- Slider de Imágenes -->
-        <div class="slider-container">
-            <div class="slider">
-                <img src="img/slider/001.webp" alt="Imagen 1">
-                <img src="img/slider/002.webp" alt="Imagen 2">
-                <img src="img/slider/003.webp" alt="Imagen 3">
-                <img src="img/slider/004.webp" alt="Imagen 4">
-                <img src="img/slider/005.webp" alt="Imagen 5">
-                <!-- Se duplican para efecto continuo -->
-                <img src="img/slider/001.webp" alt="Imagen 1">
-                <img src="img/slider/002.webp" alt="Imagen 2">
-                <img src="img/slider/003.webp" alt="Imagen 3">
-                <img src="img/slider/004.webp" alt="Imagen 4">
-                <img src="img/slider/005.webp" alt="Imagen 5">
-            </div>
-        </div>
+    <h1 class="main-title">OBJETOS PERDIDOS</h1>
 
-        <a href="/store/productos.html" class="btn-explorar">Explorar Productos</a>
+    <div class="burger">
+      <i class="fas fa-bars"></i>
+    </div>
 
-        <!-- Sección Encuéntranos -->
-        <div class="encuentranos">
-            <h2>Encuéntranos en:</h2>
-            <div class="redes-sociales">
-                <a href="https://www.instagram.com/?hl=es" class="fab fa-instagram"></a>
-                <a href="https://www.facebook.com/?locale=es_LA" class="fab fa-facebook"></a>
-                <a href="https://www.whatsapp.com/?lang=es_LA" class="fab fa-whatsapp"></a>
-                <a href="https://www.google.com/maps/@15,-2.970703,3z?hl=es" class="fas fa-map-marker-alt"></a>
-                <a href="https://www.google.com/maps/@15,-2.970703,3z?hl=es" class="fab fa-tiktok"></a>
-            </div>
-        </div>
-    </main>
+    <nav class="navbar">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="store/productos.html">Catálogo</a></li>
+        <li><a href="store/carrito.html">Formulario</a></li>
+        <li><a href="store/admin.html">Administrador</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <footer>
-        <p>&copy; 2025 Hacienda la Violeta. Todos los derechos reservados.</p>
-    </footer>
+  <main>
+    <h2>Encuentra tus objetos extraviados</h2>
+    <p>Si perdiste algo aquí podrás verificar si lo encontraron.</p>
+
+    <img src="img/perdidos.png" alt="Objetos Perdidos" class="img-perdidos" />
+
+    <a href="store/productos.html" class="btn-explorar">Explorar Recuperados</a>
+
+    <div class="encuentranos">
+      <h2>Encuéntranos en:</h2>
+      <div class="redes-sociales">
+        <a href="#" class="fab fa-instagram"></a>
+        <a href="#" class="fab fa-facebook"></a>
+        <a href="#" class="fab fa-whatsapp"></a>
+        <a href="#" class="fas fa-map-marker-alt"></a>
+        <a href="#" class="fab fa-tiktok"></a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Logística y Planta Física Universidad EAN.</p>
+  </footer>
+
+  <script>
+    document.querySelector(".burger").addEventListener("click", () => {
+      document.querySelector(".navbar ul").classList.toggle("active");
+    });
+  </script>
 </body>
 </html>
