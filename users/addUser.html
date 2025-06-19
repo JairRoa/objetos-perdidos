@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestión de Usuarios y Objetos Perdidos</title>
   <link rel="stylesheet" href="../styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
     :root {
       --verde-principal: #2e9d57;
@@ -16,73 +16,137 @@
       --negro:          #1a1a1a;
       --blanco:         #fefefe;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
       font-family: Arial, sans-serif;
       background: #f5f5f5;
       color: var(--negro);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header {
       background: var(--verde-principal);
       color: var(--blanco);
-      padding: 1rem;
-      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .main-title { font-size: 1.8rem; }
-    .logout-button {
-      background: var(--rojo);
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .header-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .header-nav a,
+    .header-nav button {
       color: var(--blanco);
-      border: none; padding: .5rem 1rem; border-radius: 5px;
+      background: none;
+      border: none;
+      font-weight: bold;
       cursor: pointer;
+      transition: color .2s, background .2s;
+      text-decoration: none;
+      padding: .5rem 1rem;
+      border-radius: 4px;
     }
-    .logout-button:hover { background: #c9302c; }
+    .header-nav a:hover,
+    .header-nav button:hover {
+      color: var(--amarillo-abeja);
+    }
+    .header-nav button.logout {
+      background: var(--rojo);
+    }
+    .header-nav button.logout:hover {
+      background: #c9302c;
+    }
     .tabs {
-      display: flex; justify-content: center; gap: .5rem;
+      display: flex;
+      justify-content: center;
+      gap: .5rem;
       margin: 1.5rem 0;
     }
     .tabs button {
-      flex: 1 1 150px; padding: 1rem;
-      background: var(--amarillo-abeja); color: var(--blanco);
-      border: none; border-radius: 5px;
-      font-weight: bold; cursor: pointer;
+      flex: 1 1 150px;
+      padding: 1rem;
+      background: var(--amarillo-abeja);
+      color: var(--blanco);
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
       transition: background .3s;
     }
-    .tabs button.active { background: var(--verde-claro); }
-    main {
-      max-width: 960px; margin: 0 auto 2rem; padding: 0 1rem;
+    .tabs button.active {
+      background: var(--verde-claro);
     }
-    section { display: none; }
-    section.active { display: block; }
-
-    /* Formularios */
+    main {
+      flex: 1;
+      max-width: 960px;
+      margin: 0 auto 2rem;
+      padding: 0 1rem;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    footer {
+      background: var(--verde-principal);
+      color: var(--blanco);
+      text-align: center;
+      padding: 1rem;
+    }
     .entity-form {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-      background: var(--blanco); padding: 1rem; border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      background: var(--blanco);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
     }
     .entity-form label { font-weight: bold; }
-    .entity-form input, .entity-form select, .entity-form textarea {
+    .entity-form input,
+    .entity-form select,
+    .entity-form textarea {
       width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: 4px;
     }
     .entity-form button {
-      grid-column: span 2; padding: .75rem;
-      background: var(--amarillo-abeja); color: var(--blanco);
-      border: none; border-radius: 5px;
-      font-weight: bold; cursor: pointer;
+      grid-column: span 2;
+      padding: .75rem;
+      background: var(--amarillo-abeja);
+      color: var(--blanco);
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
       transition: background .3s;
     }
     .entity-form button:hover { background: var(--verde-claro); }
-
-    /* Tablas */
     .table-wrapper { overflow-x: auto; margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+    table {
+      width: 100%; border-collapse: collapse; margin-bottom: 1rem;
+    }
     th, td {
       padding: .75rem; border: 1px solid #ddd; text-align: left;
     }
     th {
       background: var(--amarillo-abeja); color: var(--blanco);
     }
-    button.save-btn, button.edit-btn, button.delete-btn {
+    button.save-btn,
+    button.edit-btn,
+    button.delete-btn {
       padding: .4rem .8rem; border: none; border-radius: 4px;
       cursor: pointer; margin-right: .25rem;
     }
@@ -92,8 +156,6 @@
     button.edit-btn:hover { background: #f0c94a; }
     button.delete-btn { background: var(--rojo); color: var(--blanco); }
     button.delete-btn:hover { background: #c9302c; }
-
-    /* Paginación */
     .pagination {
       display: flex; justify-content: center; gap: .5rem; margin-bottom: 2rem;
     }
@@ -114,19 +176,23 @@
 </head>
 <body>
   <header>
-    <div class="main-title">GESTIÓN DE USUARIOS Y OBJETOS</div>
-    <button id="logout-button" class="logout-button">Cerrar Sesión</button>
+    <div class="logo">Objetos Perdidos</div>
+    <div class="header-nav">
+      <a href="../index.html">Inicio</a>
+      <li><a href="/store/productos.html">Objetos</a></li>
+      <button class="logout" id="logout-btn">Cerrar Sesión</button>
+    </div>
   </header>
 
   <div class="tabs">
-    <button data-tab="user" class="active">Usuarios</button>
-    <button data-tab="object">Objetos</button>
+    <button data-tab="users" class="active">Usuarios</button>
+    <button data-tab="objects-section">Objetos</button>
   </div>
 
   <main>
-    <!-- SECCIÓN USUARIOS -->
-    <section id="user-tab" class="active">
-      <h2>Usuarios</h2>
+    <section id="users" class="active">
+      <h2>Gestión de Usuarios</h2>
+      <!-- Formulario Usuarios -->
       <form id="add-user-form" class="entity-form">
         <div><label for="user-name">Nombre</label><input type="text" id="user-name" required /></div>
         <div><label for="user-role">Rol</label>
@@ -142,6 +208,7 @@
         <input type="hidden" id="editing-user-id" />
         <button type="submit" id="submit-user-btn">Agregar Usuario</button>
       </form>
+      <!-- Tabla Usuarios -->
       <div class="table-wrapper">
         <table>
           <thead>
@@ -153,9 +220,9 @@
       <div id="users-pagination" class="pagination"></div>
     </section>
 
-    <!-- SECCIÓN OBJETOS -->
-    <section id="object-tab">
-      <h2>Objetos</h2>
+    <section id="objects-section">
+      <h2>Gestión de Objetos</h2>
+      <!-- Formulario Objetos -->
       <form id="add-object-form" class="entity-form" enctype="multipart/form-data">
         <div><label for="object-name">Nombre del Objeto</label><input type="text" id="object-name" required /></div>
         <div><label for="object-date">Fecha de Recuperación</label><input type="date" id="object-date" required /></div>
@@ -167,13 +234,11 @@
         </div>
         <button type="submit">Agregar Objeto</button>
       </form>
+      <!-- Tabla Objetos -->
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr>
-              <th>#</th><th>Nombre</th><th>Fecha</th><th>Descripción</th><th>Lugar</th>
-              <th>Imagen</th><th>Estado</th><th>Acciones</th>
-            </tr>
+            <tr><th>#</th><th>Nombre</th><th>Fecha</th><th>Descripción</th><th>Lugar</th><th>Imagen</th><th>Estado</th><th>Acciones</th></tr>
           </thead>
           <tbody id="objects-table-body"></tbody>
         </table>
@@ -182,14 +247,31 @@
     </section>
   </main>
 
-  <footer><p>&copy; 2025 Objetos Perdidos</p></footer>
+  <footer>&copy; 2025 Objetos Perdidos</footer>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAuth, setPersistence, browserLocalPersistence, onAuthStateChanged, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      getDoc,
+      setDoc,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // Inicialización Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
       authDomain: "objetosperdidos-76abd.firebaseapp.com",
@@ -199,52 +281,77 @@
       appId: "1:609690831592:web:f7a276b069c426ef53175d",
       measurementId: "G-95C30B5EK1"
     };
-    const app  = initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     setPersistence(auth, browserLocalPersistence);
-    const db   = getFirestore(app);
+    const db = getFirestore(app);
 
-    // Paginación auxiliar
+    const sectionsNav = {
+      home: document.getElementById("home"),
+      objects: document.getElementById("objects-section")
+    };
+    document.querySelectorAll(".header-nav a[data-nav]").forEach(link => {
+      link.addEventListener("click", () => {
+        Object.values(sectionsNav).forEach(s => s.classList.remove("active"));
+        sectionsNav[link.dataset.nav].classList.add("active");
+      });
+    });
+
+    document.querySelectorAll(".tabs button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tabs button").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll("main > section").forEach(s => s.classList.remove("active"));
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "/store/admin.html";
+    });
+
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "/store/admin.html";
+      } else {
+        loadUsers();
+        loadObjects();
+      }
+    });
+
     const ITEMS_PER_PAGE = 50;
-    function paginate(items, page, fn, container, pager) {
+    function paginate(items, page, render, container, pager) {
       const total = Math.ceil(items.length / ITEMS_PER_PAGE);
       container.innerHTML = "";
       const start = (page - 1) * ITEMS_PER_PAGE;
-      items.slice(start, start + ITEMS_PER_PAGE).forEach((it, i) => fn(it, start + i + 1));
+      items.slice(start, start + ITEMS_PER_PAGE).forEach((it, i) => render(it, start + i + 1));
       pager.innerHTML = "";
-      const makeBtn = (label, p) => {
-        const btn = document.createElement("button");
-        btn.textContent = label;
-        if (p < 1 || p > total) btn.classList.add("disabled");
-        else if (p === page) btn.classList.add("current");
-        else btn.onclick = () => paginate(items, p, fn, container, pager);
-        pager.append(btn);
+      const mk = (lbl, p) => {
+        const b = document.createElement("button"); b.textContent = lbl;
+        if (p<1||p>total) b.classList.add("disabled");
+        else if(p===page) b.classList.add("current");
+        else b.onclick = () => paginate(items, p, render, container, pager);
+        pager.append(b);
       };
-      makeBtn("«", page - 1);
-      for (let i = 1; i <= total; i++) makeBtn(i, i);
-      makeBtn("»", page + 1);
+      mk("«", page-1);
+      for (let i=1;i<=total;i++) mk(i, i);
+      mk("»", page+1);
     }
 
-    // USUARIOS
     let users = [];
-    const usersBody = document.getElementById("users-table-body");
-    const usersPager = document.getElementById("users-pagination");
-
-    async function loadUsers() {
+    const uBody = document.getElementById("users-table-body"), uPager = document.getElementById("users-pagination");
+    async function loadUsers(){
       users = [];
-      (await getDocs(collection(db, "users"))).forEach(d => users.push({ id: d.id, ...d.data() }));
-      users.sort((a, b) => b.createdAt?.toMillis() - a.createdAt?.toMillis());
-      paginate(users, 1, renderUser, usersBody, usersPager);
+      (await getDocs(collection(db,"users"))).forEach(d=>users.push({id:d.id,...d.data()}));
+      users.sort((a,b)=>(b.createdAt?.toMillis()||0)-(a.createdAt?.toMillis()||0));
+      paginate(users,1,renderUser,uBody,uPager);
     }
-
-    function renderUser(u, idx) {
-      usersBody.insertAdjacentHTML("beforeend", `
+    function renderUser(u, idx){
+      uBody.insertAdjacentHTML("beforeend",`
         <tr data-id="${u.id}">
-          <td>${idx}</td>
-          <td>${u.name}</td>
-          <td>${u.role}</td>
-          <td>${u.email}</td>
-          <td>${u.phone}</td>
+          <td>${idx}</td><td>${u.name}</td><td>${u.role}</td>
+          <td>${u.email}</td><td>${u.phone}</td>
           <td>
             <button class="edit-btn">Editar</button>
             <button class="delete-btn">Eliminar</button>
@@ -252,190 +359,100 @@
         </tr>`);
       attachUserListeners();
     }
-
-    function attachUserListeners() {
-      usersBody.querySelectorAll(".edit-btn").forEach(btn => {
-        btn.onclick = async () => {
-          const id = btn.closest("tr").dataset.id;
-          const data = (await getDoc(doc(db, "users", id))).data();
-          document.getElementById("user-name").value = data.name;
-          document.getElementById("user-role").value = data.role;
-          document.getElementById("user-email").value = data.email;
-          document.getElementById("user-phone").value = data.phone;
-          document.getElementById("user-password").value = '';
-          document.getElementById("confirm-password").value = '';
-          document.getElementById("editing-user-id").value = id;
-          document.getElementById("submit-user-btn").textContent = "Actualizar Usuario";
-        };
+    function attachUserListeners(){
+      uBody.querySelectorAll(".edit-btn").forEach(b=>b.onclick=async()=>{
+        const id=b.closest("tr").dataset.id;
+        const d=(await getDoc(doc(db,"users",id))).data();
+        document.getElementById("user-name").value=d.name;
+        document.getElementById("user-role").value=d.role;
+        document.getElementById("user-email").value=d.email;
+        document.getElementById("user-phone").value=d.phone;
+        document.getElementById("user-password").value="";
+        document.getElementById("confirm-password").value="";
+        document.getElementById("editing-user-id").value=id;
+        document.getElementById("submit-user-btn").textContent="Actualizar Usuario";
       });
-      usersBody.querySelectorAll(".delete-btn").forEach(btn => {
-        btn.onclick = async () => {
-          if (!confirm("¿Estás seguro que quieres eliminar este usuario?")) return;
-          const id = btn.closest("tr").dataset.id;
-          try {
-            await deleteDoc(doc(db, "users", id));
-            loadUsers();
-          } catch (err) {
-            alert("Error al eliminar usuario: " + err.code);
-          }
-        };
+      uBody.querySelectorAll(".delete-btn").forEach(b=>b.onclick=async()=>{
+        if(!confirm("¿Estás seguro que quieres eliminar este usuario?")) return;
+        await deleteDoc(doc(db,"users",b.closest("tr").dataset.id));
+        loadUsers();
       });
     }
-
-    document.getElementById("add-user-form").addEventListener("submit", async e => {
+    document.getElementById("add-user-form").addEventListener("submit",async e=>{
       e.preventDefault();
-      const id = document.getElementById("editing-user-id").value;
-      const name = document.getElementById("user-name").value.trim();
-      const role = document.getElementById("user-role").value;
-      const email = document.getElementById("user-email").value.trim();
-      const phone = document.getElementById("user-phone").value.trim();
-      const pwd = document.getElementById("user-password").value;
-      const pwd2 = document.getElementById("confirm-password").value;
-      if (!name || !role || !email || !phone || !pwd || !pwd2) {
-        return alert("Todos los campos son obligatorios.");
-      }
-      if (pwd !== pwd2) {
-        return alert("Las contraseñas no coinciden.");
-      }
-      if (id) {
-        try {
-          await updateDoc(doc(db, "users", id), { name, role, email, phone });
-          alert("Usuario actualizado.");
-        } catch (err) {
-          alert("Sin permisos: " + err.code);
-        }
+      const id=document.getElementById("editing-user-id").value;
+      const name=document.getElementById("user-name").value.trim();
+      const role=document.getElementById("user-role").value;
+      const email=document.getElementById("user-email").value.trim();
+      const phone=document.getElementById("user-phone").value.trim();
+      const pwd=document.getElementById("user-password").value;
+      const pwd2=document.getElementById("confirm-password").value;
+      if(!name||!role||!email||!phone||!pwd||!pwd2) return alert("Todos los campos son obligatorios.");
+      if(pwd!==pwd2) return alert("Las contraseñas no coinciden.");
+      if(id){
+        await updateDoc(doc(db,"users",id),{name,role,email,phone});
+        alert("Usuario actualizado.");
       } else {
-        try {
-          const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-          await setDoc(doc(db, "users", cred.user.uid), {
-            uid: cred.user.uid,
-            name,
-            role,
-            email,
-            phone,
-            createdAt: serverTimestamp()
-          });
-          alert("Usuario creado.");
-        } catch (err) {
-          alert("Error creando usuario: " + err.code);
-        }
+        const cred=await createUserWithEmailAndPassword(auth,email,pwd);
+        await setDoc(doc(db,"users",cred.user.uid),{uid:cred.user.uid,name,role,email,phone,createdAt:serverTimestamp()});
+        alert("Usuario creado.");
       }
       e.target.reset();
-      document.getElementById("editing-user-id").value = "";
-      document.getElementById("submit-user-btn").textContent = "Agregar Usuario";
+      document.getElementById("editing-user-id").value="";
+      document.getElementById("submit-user-btn").textContent="Agregar Usuario";
       loadUsers();
     });
 
-    // SECCIÓN OBJETOS
-    let objects = [];
-    const objBody = document.getElementById("objects-table-body");
-    const objPager = document.getElementById("objects-pagination");
-
-    async function loadObjects() {
-      objects = [];
-      (await getDocs(collection(db, "objects"))).forEach(d => objects.push({ id: d.id, ...d.data() }));
-      objects.sort((a, b) => b.createdAt?.toMillis() - a.createdAt?.toMillis());
-      paginate(objects, 1, renderObject, objBody, objPager);
+    let objects=[];
+    const oBody=document.getElementById("objects-table-body"), oPager=document.getElementById("objects-pagination");
+    async function loadObjects(){
+      objects=[];
+      (await getDocs(collection(db,"objects"))).forEach(d=>objects.push({id:d.id,...d.data()}));
+      objects.sort((a,b)=>(b.createdAt?.toMillis()||0)-(a.createdAt?.toMillis()||0));
+      paginate(objects,1,renderObject,oBody,oPager);
     }
-
-    function renderObject(o, idx) {
-      objBody.insertAdjacentHTML("beforeend", `
+    function renderObject(o, idx){
+      oBody.insertAdjacentHTML("beforeend",`
         <tr data-id="${o.id}">
           <td>${idx}</td><td>${o.name}</td><td>${o.date}</td>
           <td>${o.description}</td><td>${o.location}</td>
-          <td>${o.imageUrl ? `<img src="${o.imageUrl}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">` : '—' }</td>
-          <td>
-            <select class="status-select">
-              <option value="por entregar"${o.status === 'por entregar' ? ' selected' : ''}>Por entregar</option>
-              <option value="entregado"${o.status === 'entregado' ? ' selected' : ''}>Entregado</option>
-              <option value="de baja"${o.status === 'de baja' ? ' selected' : ''}>De baja</option>
-            </select>
-          </td>
-          <td>
-            <button class="save-btn">Guardar</button>
-            <button class="delete-btn">Eliminar</button>
-          </td>
+          <td>${o.imageUrl?`<img src="${o.imageUrl}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">`:'—'}</td>
+          <td><select class="status-select">
+            <option value="por entregar"${o.status==='por entregar'?' selected':''}>Por entregar</option>
+            <option value="entregado"${o.status==='entregado'?' selected':''}>Entregado</option>
+            <option value="de baja"${o.status==='de baja'?' selected':''}>De baja</option>
+          </select></td>
+          <td><button class="save-btn">Guardar</button><button class="delete-btn">Eliminar</button></td>
         </tr>`);
       attachObjectListeners();
     }
-
-    function attachObjectListeners() {
-      objBody.querySelectorAll(".save-btn").forEach(btn => {
-        btn.onclick = async () => {
-          const row = btn.closest("tr");
-          const id = row.dataset.id;
-          const status = row.querySelector(".status-select").value;
-          try {
-            await updateDoc(doc(db, "objects", id), { status });
-            if (status !== 'por entregar') row.remove();
-            alert("Estado actualizado.");
-          } catch (err) {
-            alert("Sin permisos: " + err.code);
-          }
-        };
+    function attachObjectListeners(){
+      oBody.querySelectorAll(".save-btn").forEach(b=>b.onclick=async()=>{
+        const row=b.closest("tr"), id=row.dataset.id;
+        const status=row.querySelector(".status-select").value;
+        await updateDoc(doc(db,"objects",id),{status});
+        if(status!=='por entregar') row.remove();
+        alert("Estado actualizado.");
       });
-      objBody.querySelectorAll(".delete-btn").forEach(btn => {
-        btn.onclick = async () => {
-          if (!confirm("¿Estás seguro que quieres eliminar este objeto?")) return;
-          const id = btn.closest("tr").dataset.id;
-          try {
-            await deleteDoc(doc(db, "objects", id));
-            loadObjects();
-          } catch (err) {
-            alert("Sin permisos: " + err.code);
-          }
-        };
+      oBody.querySelectorAll(".delete-btn").forEach(b=>b.onclick=async()=>{
+        if(!confirm("¿Estás seguro que quieres eliminar este objeto?")) return;
+        await deleteDoc(doc(db,"objects",b.closest("tr").dataset.id));
+        loadObjects();
       });
     }
-
-    document.getElementById("add-object-form").addEventListener("submit", async e => {
+    document.getElementById("add-object-form").addEventListener("submit",async e=>{
       e.preventDefault();
-      const f = e.target;
-      const name = f["object-name"].value.trim();
-      const date = f["object-date"].value;
-      const desc = f["object-description"].value.trim();
-      const loc = f["object-location"].value.trim();
-      const file = f["object-image"].files[0];
-      if (!name || !date || !desc || !loc) return alert("Todos los campos excepto imagen son obligatorios.");
-      let imageUrl = "";
-      if (file) {
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("upload_preset", "ObjetosPerdidos");
-        const res = await fetch(`https://api.cloudinary.com/v1_1/dplgx0sze/upload`, { method: "POST", body: fd });
-        const js = await res.json();
-        imageUrl = js.secure_url;
+      const f=e.target, name=f["object-name"].value.trim(), date=f["object-date"].value;
+      const desc=f["object-description"].value.trim(), loc=f["object-location"].value.trim();
+      const file=f["object-image"].files[0];
+      if(!name||!date||!desc||!loc) return alert("Todos los campos excepto imagen son obligatorios.");
+      let imageUrl="";
+      if(file){ const fd=new FormData(); fd.append("file",file); fd.append("upload_preset","ObjetosPerdidos");
+        const res=await fetch("https://api.cloudinary.com/v1_1/dplgx0sze/upload",{method:"POST",body:fd});
+        const js=await res.json(); imageUrl=js.secure_url;
       }
-      try {
-        await addDoc(collection(db, "objects"), {
-          name, date, description: desc, location: loc,
-          imageUrl, status: "por entregar", createdAt: serverTimestamp()
-        });
-        alert("Objeto agregado.");
-        f.reset();
-        loadObjects();
-      } catch (err) {
-        alert("Error agregando objeto: " + err.code);
-      }
-    });
-
-    // Tabs y Logout
-    document.querySelectorAll(".tabs button").forEach(btn => btn.onclick = () => {
-      document.querySelectorAll(".tabs button").forEach(x => x.classList.remove("active"));
-      btn.classList.add("active");
-      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-      document.getElementById(`${btn.dataset.tab}-tab`).classList.add("active");
-    });
-    document.getElementById("logout-button").onclick = async () => {
-      await signOut(auth);
-      location.href = "../store/admin.html";
-    };
-
-    // Auth guard
-    onAuthStateChanged(auth, user => {
-      if (!user) return location.href = "../store/admin.html";
-      loadUsers();
-      loadObjects();
+      await addDoc(collection(db,"objects"),{name,date,description:desc,location:loc,imageUrl,status:"por entregar",createdAt:serverTimestamp()});
+      alert("Objeto agregado."); f.reset(); loadObjects();
     });
   </script>
 </body>

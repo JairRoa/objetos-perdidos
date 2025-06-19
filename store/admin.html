@@ -133,6 +133,7 @@
       getAuth,
       setPersistence,
       browserLocalPersistence,
+      onAuthStateChanged,
       signInWithEmailAndPassword
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
@@ -147,13 +148,20 @@
       measurementId: "G-95C30B5EK1"
     };
 
-    // Inicializar
+    // Inicializar App y Auth
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Antes de iniciar sesión, asegurar persistencia local
+    // Persistencia local
     setPersistence(auth, browserLocalPersistence)
       .catch(err => console.warn("No se pudo establecer persistencia:", err));
+
+    // Si ya está logueado, redirige al panel y no muestra login
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        window.location.href = "/users/addUser.html";
+      }
+    });
 
     // Manejo de login
     document.getElementById("login-form")
@@ -163,7 +171,6 @@
         const password = document.getElementById("password").value;
         try {
           await signInWithEmailAndPassword(auth, email, password);
-          // Redirigir tras login exitoso
           window.location.href = "/users/addUser.html";
         } catch (err) {
           console.error("Auth error:", err.code, err.message);
