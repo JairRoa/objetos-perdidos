@@ -11,97 +11,136 @@
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
-  <!-- ▸ Firebase JS SDK (v 11 modular) + configuración correcta -->
+  <!-- ▸ Firebase JS SDK v11 (configuración idéntica) -->
   <script type="module">
     import { initializeApp }    from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getAuth }          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
     import { getFirestore }     from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
-  authDomain: "objetosperdidos-76abd.firebaseapp.com",
-  projectId: "objetosperdidos-76abd",
-  storageBucket: "objetosperdidos-76abd.firebasestorage.app",
-  messagingSenderId: "609690831592",
-  appId: "1:609690831592:web:f7a276b069c426ef53175d",
-  measurementId: "G-95C30B5EK1"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
+      authDomain: "objetosperdidos-76abd.firebaseapp.com",
+      projectId: "objetosperdidos-76abd",
+      storageBucket: "objetosperdidos-76abd.firebasestorage.app",
+      messagingSenderId: "609690831592",
+      appId: "1:609690831592:web:f7a276b069c426ef53175d",
+      measurementId: "G-95C30B5EK1"
+    };
 
-    /* Inicializa Firebase */
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db   = getFirestore(app);
-
-    /* Por ahora esta página no usa aún auth/db,
-       pero así mantenemos la misma config en todo el sitio. */
   </script>
 
-  <!-- Estilos específicos (solo los que no están ya en styles.css) -->
   <style>
-    :root{
-      --verde-principal:#2e9d57;--verde-claro:#7dd081;
-      --amarillo-abeja:#f9d94e;--azul-oscuro:#2b4f97;
-      --negro:#1a1a1a;--blanco:#fefefe
+    :root {
+      --verde-principal: #2e9d57;
+      --amarillo-abeja: #f9d94e;
+      --negro: #1a1a1a;
+      --blanco: #fefefe;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      font-family:Arial,Helvetica,sans-serif;color:var(--negro);
-      background:url("img/background.png") center/cover fixed no-repeat
-    }
-    header{
-      background:var(--verde-principal);padding:1rem;position:relative;
-      display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
-      text-align:center
-    }
-    .logo{position:absolute;left:1rem;top:1rem}
-    .logo img{width:120px;height:auto}
-    .main-title{width:100%;font-size:2rem;color:var(--blanco);margin-top:.5rem}
-    .burger{display:none;position:absolute;right:1rem;top:1rem;
-            font-size:1.8rem;color:var(--amarillo-abeja);cursor:pointer}
-    .navbar{width:100%;margin-top:.5rem}
-    .navbar ul{display:flex;justify-content:center;flex-wrap:wrap;gap:1rem;list-style:none}
-    .navbar a{color:var(--blanco);font-weight:700;text-decoration:none;transition:.3s}
-    .navbar a:hover{color:var(--amarillo-abeja)}
-    main{padding:2rem;text-align:center}
-    .img-perdidos{display:block;margin:2rem auto;width:80%;max-width:100%;height:auto;object-fit:contain}
-    .btn-explorar{display:inline-block;margin-top:20px;padding:12px 20px;font-size:18px;
-      background:var(--amarillo-abeja);color:var(--negro);border-radius:5px;font-weight:700;
-      text-decoration:none;transition:.3s}
-    .btn-explorar:hover{background:var(--verde-claro);transform:scale(1.05)}
-    .encuentranos{margin-top:40px;padding:20px;background:var(--amarillo-abeja);border-radius:10px}
-    .encuentranos h2{margin-bottom:15px;color:var(--azul-oscuro);font-size:24px}
-    .redes-sociales{display:flex;justify-content:center;gap:20px}
-    .redes-sociales a{font-size:30px;color:var(--azul-oscuro);transition:.3s}
-    .redes-sociales a:hover{color:var(--verde-principal);transform:scale(1.2)}
-    footer{text-align:center;padding:1rem;background:var(--verde-principal);color:var(--blanco)}
 
-    /* Responsive */
-    @media(max-width:768px){
-      header{flex-direction:column;padding-top:1rem}
-      .logo{position:static;margin-bottom:.5rem}
-      .main-title{font-size:1.8rem;margin:0}
-      .burger{display:block;position:static;order:2;margin-top:.5rem}
-      .navbar{order:3;width:100%;text-align:center;margin-top:.5rem}
-      .navbar ul{display:none;flex-direction:column;background:var(--verde-principal);padding:.5rem 0}
-      .navbar ul.active{display:flex}
-      .navbar li{margin:.5rem 0}
-      .img-perdidos{width:100%}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--negro);
+      background: url("img/background.png") center/cover fixed no-repeat;
+    }
+
+    header {
+      background: var(--verde-principal);
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo img {
+      width: 120px;
+      height: auto;
+    }
+
+    .navbar ul {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+      align-items: center;
+    }
+
+    .navbar a {
+      color: var(--blanco);
+      font-weight: 700;
+      text-decoration: none;
+      transition: .3s;
+    }
+
+    .navbar a:hover {
+      color: var(--amarillo-abeja);
+    }
+
+    .btn-explorar {
+      background: var(--amarillo-abeja);
+      color: var(--negro);
+      padding: 10px 16px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .btn-explorar:hover {
+      background: var(--blanco);
+      transform: scale(1.05);
+    }
+
+    main {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .img-perdidos {
+      display: block;
+      margin: 2rem auto;
+      width: 80%;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: var(--verde-principal);
+      color: var(--blanco);
+    }
+
+    /* Full width en móviles */
+    @media (max-width: 768px) {
+      .img-perdidos {
+        width: 100%;
+        margin: 2rem 0;
+      }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <div class="logo"><img src="img/logto wilferson.png" alt="Logo" /></div>
-    <h1 class="main-title">OBJETOS RECUPERADOS</h1>
-
-    <div class="burger"><i class="fas fa-bars"></i></div>
+    <div class="logo">
+      <img src="img/logto wilferson.png" alt="Logo Objetos Perdidos" />
+    </div>
 
     <nav class="navbar">
       <ul>
         <li><a href="store/productos.html" class="btn-explorar">Busca tu objeto</a></li>
-        <li><a href="store/admin.html" title="Iniciar Sesión"><i class="fa-solid fa-right-to-bracket"></i></a></li>
+        <li style="margin-left: auto;">
+          <a href="store/admin.html" title="Iniciar Sesión">
+            <i class="fa-solid fa-right-to-bracket fa-lg"></i>
+          </a>
+        </li>
       </ul>
     </nav>
   </header>
@@ -109,25 +148,11 @@ const firebaseConfig = {
   <main>
     <h2>Encuentra tus objetos extraviados</h2>
     <p>Si perdiste algo, aquí podrás verificar si lo encontraron.</p>
-
-    <img src="img/perdidos.png" alt="Objetos Perdidos" class="img-perdidos"/>
-
-    <a href="store/productos.html" class="btn-explorar">Explorar recuperados</a>
-
-    
+    <img src="img/perdidos.png" alt="Objetos Perdidos" class="img-perdidos" />
   </main>
 
   <footer>
-    <p>&copy; 2025 Logística y Planta Física · Universidad EAN</p>
+    <p>&copy; 2025 Infraestructura y Planta Física.</p>
   </footer>
-
-  <!-- Toggle menú hamburguesa -->
-  <script>
-    document
-      .querySelector(".burger")
-      .addEventListener("click", () =>
-        document.querySelector(".navbar ul").classList.toggle("active")
-      );
-  </script>
 </body>
 </html>

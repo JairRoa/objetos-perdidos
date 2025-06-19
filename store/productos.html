@@ -25,47 +25,34 @@
       background: url("../img/background.png") no-repeat center center fixed;
       background-size: cover;
     }
+
+    /* HEADER */
     header {
       background: var(--verde-principal);
       padding: 1rem;
-      text-align: center;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       color: var(--blanco);
-    }
-    .menu-toggle {
-      display: none;
-      position: absolute; left: 1rem; top: 1rem;
-      background: none; border: none;
-      font-size: 1.8rem; color: var(--amarillo-abeja);
-      cursor: pointer;
     }
     header h1 {
       font-size: 2rem;
     }
-    nav.navbar ul {
-      list-style: none;
+    header nav {
       display: flex;
-      justify-content: center;
+      align-items: center;
       gap: 1rem;
-      margin-top: 0.5rem;
     }
-    nav.navbar a {
+    header nav a {
       color: var(--blanco);
       text-decoration: none;
       font-weight: bold;
       transition: color 0.3s;
     }
-    nav.navbar a:hover { color: var(--amarillo-abeja); }
-    @media (max-width: 768px) {
-      .menu-toggle { display: block; }
-      nav.navbar ul {
-        display: none;
-        flex-direction: column;
-        background: var(--verde-principal);
-        position: absolute; top:100%; left:0; width:100%;
-      }
-      nav.navbar ul.active { display: flex; }
+    header nav a:hover {
+      color: var(--amarillo-abeja);
     }
+
     main {
       padding: 2rem;
       text-align: center;
@@ -74,49 +61,88 @@
       color: var(--azul-oscuro);
       margin-bottom: 1rem;
     }
+    #productos-lista {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
     .producto {
       background: var(--blanco);
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      display: inline-block;
-      margin: 1rem;
-      max-width: 300px;
+      width: 280px;
       padding: 1rem;
-      vertical-align: top;
       text-align: left;
+      display: flex;
+      flex-direction: column;
     }
     .producto img {
       width: 100%;
-      height: 200px;
+      height: 160px;
       object-fit: cover;
       border-radius: 5px;
     }
     .producto h3 {
-      margin: 0.5rem 0;
+      margin: .5rem 0;
       color: var(--verde-principal);
+      font-size: 1.1rem;
     }
     .producto p {
-      margin: 0.25rem 0;
-      font-size: 0.9rem;
+      margin: .25rem 0;
+      font-size: .9rem;
+      flex-grow: 1;
     }
-    .producto .reclamar-btn {
-      display: block;
-      width: 100%;
-      padding: 0.5rem;
+    .reclamar-btn {
       background: var(--amarillo-abeja);
       color: var(--negro);
       border: none;
       border-radius: 5px;
+      padding: .5rem;
       font-weight: bold;
-      text-align: center;
-      margin-top: 0.5rem;
       cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
+      text-align: center;
+      transition: background .3s, transform .2s;
+      margin-top: 1rem;
     }
-    .producto .reclamar-btn:hover {
+    .reclamar-btn:hover {
       background: var(--verde-claro);
       transform: scale(1.03);
     }
+
+    /* PAGINACIÓN */
+    #pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: .5rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    #pagination button {
+      background: var(--blanco);
+      color: var(--negro);
+      border: 1px solid var(--verde-principal);
+      border-radius: 4px;
+      padding: .4rem .8rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background .2s, color .2s;
+    }
+    #pagination button:hover {
+      background: var(--verde-principal);
+      color: var(--blanco);
+    }
+    #pagination button.disabled {
+      opacity: .5;
+      cursor: default;
+    }
+    #pagination button.current {
+      background: var(--verde-principal);
+      color: var(--blanco);
+      cursor: default;
+    }
+
     footer {
       text-align: center;
       padding: 1rem;
@@ -127,15 +153,14 @@
   </style>
 </head>
 <body>
+
   <header>
-    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
     <h1>Objetos Perdidos</h1>
-    <nav class="navbar">
-      <ul>
-        <li><a href="../index.html">Inicio</a></li>
-        <li><a href="carrito.html">Formulario</a></li>
-        <li><a href="admin.html">Administrador</a></li>
-      </ul>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="admin.html" title="Iniciar Sesión">
+        <i class="fa-solid fa-right-to-bracket fa-lg"></i>
+      </a>
     </nav>
   </header>
 
@@ -145,19 +170,13 @@
       <div id="productos-lista">
         <p>Cargando objetos...</p>
       </div>
+      <div id="pagination"></div>
     </section>
   </main>
 
   <footer>
     <p>&copy; 2025 Infraestructura y Planta Física.</p>
   </footer>
-
-  <script>
-    document.querySelector(".menu-toggle")
-      .addEventListener("click", () => {
-        document.querySelector(".navbar ul").classList.toggle("active");
-      });
-  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
@@ -176,63 +195,90 @@
       appId: "1:609690831592:web:f7a276b069c426ef53175d",
       measurementId: "G-95C30B5EK1"
     };
-
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    async function cargarObjetos() {
-      const cont = document.getElementById("productos-lista");
-      cont.innerHTML = "";
+    const ITEMS_PER_PAGE = 20;
+    let objetos = [];
+    let currentPage = 1;
+    const listaEl = document.getElementById("productos-lista");
+    const pagEl   = document.getElementById("pagination");
 
-      try {
-        const snap = await getDocs(collection(db, "objects"));
-        const lista = [];
-        snap.forEach(docSnap => {
-          const o = docSnap.data();
-          // filtrar únicamente status "por entregar"
-          if (o.status === "por entregar") {
-            lista.push({ id: docSnap.id, ...o });
-          }
-        });
-
-        if (lista.length === 0) {
-          cont.innerHTML = "<p>No hay objetos por entregar.</p>";
-          return;
+    async function fetchObjetos() {
+      const snap = await getDocs(collection(db, "objects"));
+      const arr = [];
+      snap.forEach(docSnap => {
+        const o = docSnap.data();
+        if (o.status === "por entregar") {
+          arr.push({ id: docSnap.id, ...o });
         }
-
-        // ordenar de más reciente a más antiguo
-        lista.sort((a, b) => {
-          const ta = a.createdAt?.toDate?.() || 0;
-          const tb = b.createdAt?.toDate?.() || 0;
-          return tb - ta;
-        });
-
-        // renderizar tarjetas
-        lista.forEach(o => {
-          const nameEnc = encodeURIComponent(o.name);
-          cont.innerHTML += `
-            <div class="producto">
-              <img src="${o.imageUrl || 'https://via.placeholder.com/300'}"
-                   alt="${o.name}" />
-              <h3>${o.name}</h3>
-              <p><strong>Fecha registro:</strong>
-                ${o.createdAt?.toDate().toLocaleString("es-CO") || ""}
-              </p>
-              <p><strong>Descripción:</strong> ${o.description}</p>
-              <p><strong>Lugar:</strong> ${o.location}</p>
-              <button class="reclamar-btn"
-                onclick="location.href='carrito.html?id=${o.id}&name=${nameEnc}'">
-                Reclamar
-              </button>
-            </div>`;
-        });
-      } catch (err) {
-        console.error("Error cargando objetos:", err);
-        cont.innerHTML = "<p>Error al cargar objetos.</p>";
-      }
+      });
+      // ordenar por fecha descendente
+      arr.sort((a, b) => {
+        const ta = a.createdAt?.toDate?.() || 0;
+        const tb = b.createdAt?.toDate?.() || 0;
+        return tb - ta;
+      });
+      objetos = arr;
+      renderPage(1);
+      renderPagination();
     }
 
-    cargarObjetos();
+    function renderPage(page) {
+      currentPage = page;
+      const start = (page - 1) * ITEMS_PER_PAGE;
+      const end   = start + ITEMS_PER_PAGE;
+      const slice = objetos.slice(start, end);
+
+      listaEl.innerHTML = "";
+      if (slice.length === 0) {
+        listaEl.innerHTML = "<p>No hay objetos por entregar.</p>";
+        return;
+      }
+      slice.forEach(o => {
+        const nameEnc = encodeURIComponent(o.name);
+        listaEl.innerHTML += `
+          <div class="producto">
+            <img src="${o.imageUrl||'https://via.placeholder.com/300'}" alt="${o.name}" />
+            <h3>${o.name}</h3>
+            <p><strong>Fecha registro:</strong> ${o.createdAt?.toDate().toLocaleString("es-CO")||""}</p>
+            <p><strong>Descripción:</strong> ${o.description}</p>
+            <p><strong>Lugar:</strong> ${o.location}</p>
+            <button class="reclamar-btn"
+              onclick="location.href='carrito.html?id=${o.id}&name=${nameEnc}'">
+              Reclamar
+            </button>
+          </div>`;
+      });
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(objetos.length / ITEMS_PER_PAGE);
+      pagEl.innerHTML = "";
+
+      const makeBtn = (label, page, extraClass="") => {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        if (page < 1 || page > totalPages) {
+          btn.classList.add("disabled");
+        } else if (page === currentPage) {
+          btn.classList.add("current");
+        } else {
+          btn.addEventListener("click", () => renderPage(page));
+        }
+        if (extraClass) btn.classList.add(extraClass);
+        pagEl.appendChild(btn);
+      };
+
+      makeBtn("«", currentPage - 1);
+      for (let i = 1; i <= totalPages; i++) {
+        makeBtn(i, i);
+      }
+      makeBtn("»", currentPage + 1);
+    }
+
+    fetchObjetos();
   </script>
 </body>
 </html>

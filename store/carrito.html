@@ -7,9 +7,10 @@
 
   <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
-  <!-- Firebase -->
+  <!-- Firebase v11 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore }  from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
@@ -28,34 +29,109 @@
 
   <!-- EmailJS v3 -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script>
-    emailjs.init("3UgVwiV5ojoNsFWdJ"); // tu clave pública
-  </script>
+  <script>emailjs.init("3UgVwiV5ojoNsFWdJ");</script>
 
   <style>
-    /* Solo cambiamos el color de todo el texto a azul #2b4f97 */
-    body,
-    h2, h3, p, label, a, input, select {
-      color: #2b4f97 !important;
+    /* RESET Y GLOBAL */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      color: #2b4f97;
+    }
+    h1, h2, h3, p, label {
+      color: #2b4f97;
     }
 
+    /* HEADER */
+    header {
+      background: #2e9d57;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+    header h1 {
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+    header nav {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    header nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    header nav a:hover {
+      color: #f9d94e;
+    }
 
-    body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; }
-    header { background:#2e9d57; padding:1rem; text-align:center; position:relative; }
-    header nav a { margin:0 1rem; text-decoration:none; font-weight:bold; }
-    main { padding:2rem; max-width:600px; margin:0 auto; }
+    /* MAIN */
+    main {
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
     #producto-seleccionado,
-    form { background:#fff; padding:1rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:2rem; }
-    form { display:grid; gap:1rem; }
-    input, select { width:100%; padding:.5rem; border:1px solid #ccc; border-radius:4px; }
-    button { padding:.75rem; background:#2e9d57; border:none; border-radius:5px; font-weight:bold; cursor:pointer; color: #fff;}
-    button:hover { background:#f9d94e; }
-    #codigo { display:none; margin-top:1rem; padding:1rem; background:#e8ffe8; border:1px solid #2e9d57; border-radius:5px; text-align:center; font-weight:bold; }
-    footer { text-align:center; padding:1rem; background:#2e9d57; margin-top:2rem; }
-    @media(max-width:768px){
-      header nav { display:flex; flex-direction:column; color: #fff;}
-      header nav a { margin: .5rem 0; }
+    form {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
     }
+    form {
+      display: grid;
+      gap: 1rem;
+    }
+    input, select {
+      width: 100%;
+      padding: .5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: .75rem;
+      background: #2e9d57;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #f9d94e;
+      color: #1a1a1a;
+    }
+    #codigo {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #e8ffe8;
+      border: 1px solid #2e9d57;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      color: #2b4f97;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #2e9d57;
+      color: #fff;
+    }
+
+    /* QUIETO NAV EN MÓVIL */
+    /* Sin cambios: siempre fila */
   </style>
 </head>
 <body>
@@ -65,7 +141,9 @@
     <nav>
       <a href="../index.html">Inicio</a>
       <a href="productos.html">Objetos</a>
-      <a href="admin.html">Administrador</a>
+      <a href="store/admin.html" title="Iniciar Sesión">
+        <i class="fa-solid fa-right-to-bracket fa-lg"></i>
+      </a>
     </nav>
   </header>
 
@@ -112,8 +190,6 @@
   <script type="module">
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
     const db = window.db;
-
-    // Carga del objeto
     const params = new URLSearchParams(location.search);
     const objId  = params.get("id");
     const nameQ  = params.get("name");
@@ -132,7 +208,8 @@
         const o = snap.data();
         selIn.value = nameQ || o.name;
         cont.innerHTML = `
-          <img src="${o.imageUrl || 'https://via.placeholder.com/400'}" style="width:100%;border-radius:5px;margin-bottom:1rem">
+          <img src="${o.imageUrl||'https://via.placeholder.com/400'}"
+               style="width:100%;border-radius:5px;margin-bottom:1rem">
           <h3>${o.name}</h3>
           <p><strong>Descripción:</strong> ${o.description}</p>
           <p><strong>Lugar:</strong> ${o.location}</p>`;
@@ -142,7 +219,6 @@
     }
     cargarObjeto();
 
-    // Genera código aleatorio
     function generarCodigo() {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       return Array.from({ length: 6 })
@@ -150,7 +226,6 @@
                   .join("");
     }
 
-    // Envía el correo
     document.getElementById("client-form")
       .addEventListener("submit", async e => {
         e.preventDefault();
@@ -162,38 +237,25 @@
         const c  = document.getElementById("cliente-correo").value.trim();
         const obj = selIn.value;
         const code = generarCodigo();
-
         const templateParams = {
-          email:   c,
-          reply_to:"logisyaudio@universidadean.edu.co",
-          name:    n,
-          title:   obj,
-          message: `Código: ${code}
-Objeto: ${obj}
-
--- Datos --
-Nombre: ${n}
-Documento: ${dt} (${id})
-Facultad: ${f}
-Teléfono: ${t}
-Correo: ${c}`
+          email: c,
+          reply_to: "logisyaudio@universidadean.edu.co",
+          name: n,
+          title: obj,
+          message: `Código: ${code}\nObjeto: ${obj}\n\n-- Datos --\nNombre: ${n}\nDocumento: ${dt} (${id})\nFacultad: ${f}\nTeléfono: ${t}\nCorreo: ${c}`
         };
-
         try {
-          await emailjs.send(
-            "service_aedsi78",
-            "template_9xehgwe",
-            templateParams
-          );
+          await emailjs.send("service_aedsi78","template_9xehgwe",templateParams);
           const divCode = document.getElementById("codigo");
           divCode.textContent = `Tu número de radicado es: ${code}`;
           divCode.style.display = "block";
           alert("Correo enviado correctamente.");
         } catch (err) {
           console.error("EmailJS error:", err);
-          alert(`Error ${err.status || ""}: ${err.text || "no se pudo enviar."}`);
+          alert(`Error ${err.status||""}: ${err.text||"no se pudo enviar."}`);
         }
       });
   </script>
+
 </body>
 </html>
