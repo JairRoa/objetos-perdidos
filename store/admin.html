@@ -10,7 +10,6 @@
 
   <!-- Estilos específicos para admin.html -->
   <style>
-    /* Variables institucionales */
     :root {
       --verde-principal:   #2e9d57;
       --verde-claro:       #7dd081;
@@ -19,105 +18,67 @@
       --negro:             #1a1a1a;
       --blanco:            #fefefe;
     }
-
-    /* Reset básico */
+    /* Reset */
     *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      margin: 0; padding: 0; box-sizing: border-box;
     }
-
     body {
       font-family: Arial, sans-serif;
-      /* Mismo background que index.html */
       background: url("/img/background.png") center/cover fixed no-repeat;
       color: var(--negro);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      display: flex; flex-direction: column; min-height: 100vh;
     }
-
-    /* Header */
     header {
       background: var(--verde-principal);
       padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
     }
     header h1 {
-      color: var(--blanco);
-      font-size: 1.8rem;
+      color: var(--blanco); font-size: 1.8rem;
     }
-    header .navbar ul {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
+    .navbar ul {
+      list-style: none; display: flex; gap: 1.5rem;
     }
-    header .navbar a {
-      color: var(--blanco);
-      text-decoration: none;
-      font-weight: bold;
+    .navbar a {
+      color: var(--blanco); text-decoration: none; font-weight: bold;
       transition: color .2s;
     }
-    header .navbar a:hover {
+    .navbar a:hover {
       color: var(--amarillo-abeja);
     }
-
-    /* Main / Login */
     main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      flex: 1; display: flex; justify-content: center; align-items: center;
       padding: 2rem;
     }
     #login-section {
       background: var(--blanco);
-      padding: 2rem;
-      border-radius: 8px;
+      padding: 2rem; border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
+      width: 100%; max-width: 400px; text-align: center;
     }
     #login-section h2 {
       margin-bottom: 1.5rem;
-      color: var(--azul-oscuro);
-      font-size: 1.5rem;
+      color: var(--azul-oscuro); font-size: 1.5rem;
     }
-
-    /* Formulario */
     #login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      display: flex; flex-direction: column; gap: 1rem;
     }
     #login-form label {
-      text-align: left;
-      font-weight: 600;
-      color: var(--verde-principal);
+      text-align: left; font-weight: 600; color: var(--verde-principal);
     }
     #login-form input {
-      padding: .6rem .8rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color .2s;
+      padding: .6rem .8rem; border: 1px solid #ccc; border-radius: 4px;
+      font-size: 1rem; transition: border-color .2s;
     }
     #login-form input:focus {
-      outline: none;
-      border-color: var(--verde-principal);
+      outline: none; border-color: var(--verde-principal);
     }
     #login-form button {
       padding: .75rem;
       background: var(--verde-principal);
       color: var(--blanco);
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
+      border: none; border-radius: 5px;
+      font-size: 1rem; font-weight: bold; cursor: pointer;
       transition: background .2s, transform .1s;
     }
     #login-form button:hover {
@@ -125,8 +86,6 @@
       transform: translateY(-1px);
       color: var(--negro);
     }
-
-    /* Footer */
     footer {
       background: var(--verde-principal);
       color: var(--blanco);
@@ -134,18 +93,9 @@
       padding: 1rem 0;
       font-size: .9rem;
     }
-
-    /* Responsive */
     @media (max-width: 480px) {
-      header {
-        flex-direction: column;
-        text-align: center;
-        gap: .5rem;
-      }
-      #login-section {
-        padding: 1.5rem;
-        margin: 1rem;
-      }
+      header { flex-direction: column; text-align: center; gap: .5rem; }
+      #login-section { padding: 1.5rem; margin: 1rem; }
     }
   </style>
 </head>
@@ -178,10 +128,15 @@
   </footer>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword }
-      from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { initializeApp }    from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import {
+      getAuth,
+      setPersistence,
+      browserLocalPersistence,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
+    // Config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
       authDomain: "objetosperdidos-76abd.firebaseapp.com",
@@ -192,9 +147,15 @@
       measurementId: "G-95C30B5EK1"
     };
 
+    // Inicializar
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    // Antes de iniciar sesión, asegurar persistencia local
+    setPersistence(auth, browserLocalPersistence)
+      .catch(err => console.warn("No se pudo establecer persistencia:", err));
+
+    // Manejo de login
     document.getElementById("login-form")
       .addEventListener("submit", async e => {
         e.preventDefault();
@@ -202,9 +163,10 @@
         const password = document.getElementById("password").value;
         try {
           await signInWithEmailAndPassword(auth, email, password);
-          alert("Inicio de sesión exitoso.");
+          // Redirigir tras login exitoso
           window.location.href = "/users/addUser.html";
         } catch (err) {
+          console.error("Auth error:", err.code, err.message);
           let msg = "Error de autenticación.";
           if (err.code === "auth/invalid-email")      msg = "Correo electrónico no válido.";
           if (err.code === "auth/user-not-found")     msg = "Usuario no encontrado.";

@@ -12,6 +12,7 @@
       --verde-principal: #2e9d57;
       --amarillo-abeja: #f9d94e;
       --verde-claro:    #7dd081;
+      --rojo:           #d9534f;
       --negro:          #1a1a1a;
       --blanco:         #fefefe;
     }
@@ -30,48 +31,31 @@
       padding: 1rem;
       text-align: center;
       position: relative;
-    }
-    .logo {
-      position: absolute; left: 1rem; top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .logo img {
       width: 120px; height: auto;
     }
     .main-title {
-      width: 100%; font-size: 2rem; margin-top: .5rem;
-    }
-    .burger {
-      display: none;
-      position: absolute; right: 1rem; top: 1rem;
-      font-size: 1.8rem; color: var(--amarillo-abeja);
-      cursor: pointer;
-    }
-    .navbar {
-      width: 100%; margin-top: .5rem;
-    }
-    .navbar ul {
-      display: flex; justify-content: center;
-      flex-wrap: wrap; gap: 1rem; list-style: none;
-    }
-    .navbar a {
-      color: var(--blanco); font-weight: bold;
-      text-decoration: none; transition: .3s;
-    }
-    .navbar a:hover {
-      color: var(--amarillo-abeja);
+      font-size: 2rem;
     }
     .logout-button {
-      position: absolute; top: 1rem; right: 1rem;
-      background: #d9534f; color: #fff; border: none;
-      padding: .5rem 1rem; border-radius: 5px;
+      background: var(--rojo);
+      color: var(--blanco);
+      border: none;
+      padding: .5rem 1rem;
+      border-radius: 5px;
       cursor: pointer;
     }
     .logout-button:hover {
       background: #c9302c;
     }
     .tabs {
-      display: flex; flex-wrap: wrap;
-      justify-content: center; gap: .5rem;
+      display: flex;
+      justify-content: center;
+      gap: .5rem;
       margin: 2rem 1rem 1rem;
     }
     .tabs button {
@@ -97,14 +81,16 @@
     section.active {
       display: block;
     }
+
+    /* Formulario */
     form {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
+      margin-bottom: 1rem;
     }
     form label {
-      font-weight: bold; display: block;
-      margin-bottom: .25rem;
+      font-weight: bold;
     }
     form input, form select, form textarea {
       width: 100%; padding: .5rem;
@@ -112,7 +98,8 @@
       border-radius: 4px;
     }
     form button {
-      grid-column: span 2; padding: .75rem;
+      grid-column: span 2;
+      padding: .75rem;
       background: var(--amarillo-abeja);
       color: var(--blanco); border: none;
       border-radius: 5px; font-weight: bold;
@@ -121,8 +108,11 @@
     form button:hover {
       background: var(--verde-claro);
     }
+
+    /* Tabla */
     .table-wrapper {
-      overflow-x: auto; margin-top: 1.5rem;
+      overflow-x: auto;
+      margin-top: 1rem;
     }
     table {
       width: 100%; border-collapse: collapse;
@@ -140,28 +130,60 @@
       width: 50px; height: 50px;
       object-fit: cover; border-radius: 4px;
     }
-    td select.status-select {
-      width: 100%;
-      padding: .25rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
+    .status-select {
+      width: 100%; padding: .25rem;
+      border-radius: 4px; border: 1px solid #ccc;
     }
-    td button.save-btn {
-      padding: .5rem 1rem;
+    button.save-btn {
       background: var(--verde-principal);
       color: var(--blanco);
-      border: none;
-      border-radius: 5px;
+      border: none; padding: .5rem .75rem;
+      border-radius: 5px; cursor: pointer;
+      margin-right: .25rem;
+    }
+    button.save-btn:hover     { background: var(--verde-claro); }
+    button.edit-btn {
+      background: var(--amarillo-abeja);
+      color: var(--blanco);
+      border: none; padding: .5rem .75rem;
+      border-radius: 5px; cursor: pointer;
+      margin-right: .25rem;
+    }
+    button.edit-btn:hover     { background: #f0c94a; }
+    button.delete-btn {
+      background: var(--rojo);
+      color: var(--blanco);
+      border: none; padding: .5rem .75rem;
+      border-radius: 5px; cursor: pointer;
+    }
+    button.delete-btn:hover   { background: #c9302c; }
+
+    /* Paginación */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: .5rem;
+      margin: 1rem 0 2rem;
+    }
+    .pagination button {
+      background: var(--blanco);
+      color: var(--negro);
+      border: 1px solid var(--verde-principal);
+      padding: .4rem .8rem;
+      border-radius: 4px;
       cursor: pointer;
+      transition: background .2s, color .2s;
     }
-    td button.save-btn:hover {
-      background: var(--verde-claro);
-    }
+    .pagination button:hover { background: var(--verde-principal); color: var(--blanco); }
+    .pagination .current   { background: var(--verde-principal); color: var(--blanco); cursor: default; }
+    .pagination .disabled  { opacity: .5; cursor: default; }
+
     @media(max-width:768px){
-      .burger { display:block; }
-      .navbar ul { display:none; flex-direction:column; background:var(--verde-principal); }
-      .navbar ul.active { display:flex; }
-      header { flex-direction:column; }
+      /* permitir cámara/galería en móvil */
+      input[type="file"] {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -170,27 +192,17 @@
     <div class="logo">
       <img src="img/logto wilferson.png" alt="Logo" />
     </div>
-    <h1 class="main-title">GESTIÓN DE USUARIOS Y OBJETOS PERDIDOS</h1>
-    <div class="burger"><i class="fas fa-bars"></i></div>
-    <nav class="navbar">
-      <ul>
-        <li><a href="../index.html">Inicio</a></li>
-        <li><a href="/store/productos.html">Objetos</a></li>
-        <li><a href="/store/carrito.html">Carrito</a></li>
-      </ul>
-    </nav>
-    <button id="logout-button" class="logout-button" aria-label="Cerrar sesión">
-      Cerrar Sesión
-    </button>
+    <div class="main-title">GESTIÓN DE USUARIOS Y OBJETOS PERDIDOS</div>
+    <button id="logout-button" class="logout-button">Cerrar Sesión</button>
   </header>
 
-  <main>
-    <div class="tabs">
-      <button data-tab="user" class="active">Agregar Usuario</button>
-      <button data-tab="object">Agregar Objeto</button>
-    </div>
+  <div class="tabs">
+    <button data-tab="user" class="active">Usuarios</button>
+    <button data-tab="object">Objetos</button>
+  </div>
 
-    <!-- Sección Agregar Usuario -->
+  <main>
+    <!-- Sección Usuarios -->
     <section id="user-tab" class="active">
       <h2>Agregar Usuario</h2>
       <form id="add-user-form">
@@ -229,16 +241,16 @@
         <table>
           <thead>
             <tr>
-              <th>#</th><th>Nombre</th><th>Rol</th>
-              <th>Correo</th><th>Teléfono</th>
+              <th>#</th><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody id="users-table-body"></tbody>
         </table>
       </div>
+      <div id="users-pagination" class="pagination"></div>
     </section>
 
-    <!-- Sección Agregar Objeto -->
+    <!-- Sección Objetos -->
     <section id="object-tab">
       <h2>Agregar Objeto Perdido</h2>
       <form id="add-object-form" enctype="multipart/form-data">
@@ -260,7 +272,8 @@
         </div>
         <div>
           <label for="object-image">Imagen del Objeto</label>
-          <input type="file" id="object-image" accept="image/*" />
+          <input type="file" id="object-image"
+                 accept="image/*" capture="environment" />
         </div>
         <button type="submit">Agregar Objeto</button>
       </form>
@@ -270,14 +283,14 @@
         <table>
           <thead>
             <tr>
-              <th>#</th><th>Nombre</th><th>Fecha</th>
-              <th>Descripción</th><th>Lugar</th>
-              <th>Imagen</th><th>Estado</th><th>Acciones</th>
+              <th>#</th><th>Nombre</th><th>Fecha</th><th>Descripción</th>
+              <th>Lugar</th><th>Imagen</th><th>Estado</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody id="objects-table-body"></tbody>
         </table>
       </div>
+      <div id="objects-pagination" class="pagination"></div>
     </section>
   </main>
 
@@ -302,12 +315,13 @@
       setDoc,
       addDoc,
       getDocs,
-      getDoc,
       updateDoc,
+      deleteDoc,
+      getDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-    // Configuración Firebase
+    // Config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
       authDomain: "objetosperdidos-76abd.firebaseapp.com",
@@ -319,187 +333,210 @@
     };
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    // Mantener sesión entre recargas
     await setPersistence(auth, browserLocalPersistence);
     const db   = getFirestore(app);
 
-    // Configuración Cloudinary
-    const cloudName    = "dplgx0sze";
-    const uploadPreset = "ObjetosPerdidos";
+    // Paginación
+    const ITEMS_PER_PAGE = 50;
+    let users = [], objects = [];
 
-    async function uploadToCloudinary(file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", uploadPreset);
-      const resp = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
-        { method: "POST", body: formData }
-      );
-      const json = await resp.json();
-      if (!resp.ok) {
-        console.error("Cloudinary error:", json);
-        throw new Error(json.error?.message || "Error subiendo a Cloudinary");
-      }
-      return json.secure_url;
+    function setupPagination(items, renderFn, container) {
+      const total = Math.ceil(items.length / ITEMS_PER_PAGE);
+      container.innerHTML = "";
+      const makeBtn = (label, page) => {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        if (page < 1 || page > total) btn.classList.add("disabled");
+        else if (page === renderFn.current) btn.classList.add("current");
+        else btn.addEventListener("click", () => renderFn(page));
+        container.appendChild(btn);
+      };
+      makeBtn("«", renderFn.current - 1);
+      for (let i = 1; i <= total; i++) makeBtn(i, i);
+      makeBtn("»", renderFn.current + 1);
     }
 
-    // UI: pestañas y logout
-    window.switchTab = tab => {
-      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-      document.getElementById(`${tab}-tab`).classList.add("active");
-      document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
-      document.querySelector(`.tabs button[data-tab="${tab}"]`).classList.add("active");
-    };
-    document.querySelectorAll(".tabs button")
-      .forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
-    document.getElementById("logout-button")
-      .addEventListener("click", async () => {
-        await signOut(auth);
-        window.location.href = "../store/admin.html";
-      });
-
-    // Control de auth y carga inicial
-    onAuthStateChanged(auth, async user => {
-      if (!user) return window.location.href = "../store/admin.html";
-      const snap = await getDoc(doc(db, "users", user.uid));
-      const role = snap.exists() ? snap.data().role : null;
-      if (role !== "admin") {
-        document.querySelector('.tabs button[data-tab="user"]').style.display = "none";
-        switchTab("object");
-      }
-      loadUsers();
-      loadObjects();
-    });
-
-    // Carga Usuarios
+    // Render y listeners Usuarios
+    const usersBody = document.getElementById("users-table-body");
+    const usersPag  = document.getElementById("users-pagination");
     async function loadUsers() {
-      const tbody = document.getElementById("users-table-body");
-      tbody.innerHTML = "";
-      let i = 1;
+      users = [];
       const snap = await getDocs(collection(db, "users"));
-      snap.forEach(d => {
-        const u = d.data();
-        tbody.innerHTML += `
-          <tr>
-            <td>${i++}</td><td>${u.name}</td><td>${u.role}</td>
-            <td>${u.email}</td><td>${u.phone}</td>
+      snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+      users.sort((a,b) => b.createdAt?.toMillis() - a.createdAt?.toMillis());
+      renderUsers(1);
+    }
+    async function renderUsers(page) {
+      renderUsers.current = page;
+      usersBody.innerHTML = "";
+      const start = (page-1)*ITEMS_PER_PAGE;
+      users.slice(start, start+ITEMS_PER_PAGE).forEach((u,i) => {
+        usersBody.innerHTML += `
+          <tr data-id="${u.id}">
+            <td>${start + i + 1}</td>
+            <td>${u.name}</td>
+            <td>${u.role}</td>
+            <td>${u.email}</td>
+            <td>${u.phone}</td>
+            <td>
+              <button class="save-btn">Guardar</button>
+              <button class="edit-btn">Editar</button>
+              <button class="delete-btn">Eliminar</button>
+            </td>
           </tr>`;
       });
+      setupPagination(users, renderUsers, usersPag);
+      usersBody.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm("Eliminar usuario?")) return;
+          const id = btn.closest("tr").dataset.id;
+          await deleteDoc(doc(db, "users", id));
+          loadUsers();
+        };
+      });
     }
 
-    // Alta Usuario
+    // Render y listeners Objetos
+    const objectsBody = document.getElementById("objects-table-body");
+    const objectsPag  = document.getElementById("objects-pagination");
+    async function loadObjects() {
+      objects = [];
+      const snap = await getDocs(collection(db, "objects"));
+      snap.forEach(d => objects.push({ id: d.id, ...d.data() }));
+      objects.sort((a,b) => b.createdAt?.toMillis() - a.createdAt?.toMillis());
+      renderObjects(1);
+    }
+    async function renderObjects(page) {
+      renderObjects.current = page;
+      objectsBody.innerHTML = "";
+      const start = (page-1)*ITEMS_PER_PAGE;
+      objects.slice(start, start+ITEMS_PER_PAGE).forEach((o,i) => {
+        objectsBody.innerHTML += `
+          <tr data-id="${o.id}">
+            <td>${start + i + 1}</td>
+            <td>${o.name}</td>
+            <td>${o.date}</td>
+            <td>${o.description}</td>
+            <td>${o.location}</td>
+            <td>${o.imageUrl?`<img src="${o.imageUrl}" alt="">`:'—'}</td>
+            <td><select class="status-select">
+                <option value="por entregar"${o.status==="por entregar"?' selected':''}>Por entregar</option>
+                <option value="entregado"${o.status==="entregado"?' selected':''}>Entregado</option>
+                <option value="de baja"${o.status==="de baja"?' selected':''}>De baja</option>
+              </select>
+            </td>
+            <td>
+              <button class="save-btn">Guardar</button>
+              <button class="edit-btn">Editar</button>
+              <button class="delete-btn">Eliminar</button>
+            </td>
+          </tr>`;
+      });
+      setupPagination(objects, renderObjects, objectsPag);
+      objectsBody.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm("Eliminar objeto?")) return;
+          const id = btn.closest("tr").dataset.id;
+          await deleteDoc(doc(db, "objects", id));
+          loadObjects();
+        };
+      });
+      objectsBody.querySelectorAll(".save-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const row = btn.closest("tr");
+          const id  = row.dataset.id;
+          const status = row.querySelector(".status-select").value;
+          await updateDoc(doc(db, "objects", id), { status });
+          if (status !== "por entregar") row.remove();
+          alert("Estado actualizado.");
+        };
+      });
+    }
+
+    // Subir usuario
     document.getElementById("add-user-form")
       .addEventListener("submit", async e => {
         e.preventDefault();
-        const f     = e.target;
+        const f = e.target;
         const name  = f["user-name"].value.trim();
         const role  = f["user-role"].value;
         const email = f["user-email"].value.trim();
         const phone = f["user-phone"].value.trim();
         const pwd   = f["user-password"].value;
         const pwd2  = f["confirm-password"].value;
-        if (!name||!role||!email||!phone||!pwd||!pwd2)
-          return alert("Todos los campos son obligatorios.");
-        if (pwd !== pwd2)
-          return alert("Las contraseñas no coinciden.");
-
+        if (!name||!role||!email||!phone||!pwd||!pwd2) return alert("Todos los campos obligatorios.");
+        if (pwd!==pwd2) return alert("Contraseñas no coinciden.");
         try {
           const cred = await createUserWithEmailAndPassword(auth, email, pwd);
           await setDoc(doc(db, "users", cred.user.uid), {
             uid: cred.user.uid, name, role, email, phone,
             createdAt: serverTimestamp()
           });
-          f.reset();
-          loadUsers();
+          f.reset(); loadUsers();
         } catch (err) {
-          console.error(err);
-          alert("Error creando usuario: " + err.code);
+          console.error(err); alert("Error: "+err.code);
         }
       });
 
-    // Carga Objetos
-    async function loadObjects() {
-      const tbody = document.getElementById("objects-table-body");
-      tbody.innerHTML = "";
-      let i = 1;
-      const snap = await getDocs(collection(db, "objects"));
-      snap.forEach(d => {
-        const o = d.data();
-        const status = o.status || "por entregar";
-        tbody.innerHTML += `
-          <tr data-id="${d.id}">
-            <td>${i++}</td>
-            <td>${o.name}</td>
-            <td>${o.date}</td>
-            <td>${o.description}</td>
-            <td>${o.location}</td>
-            <td>${o.imageUrl?`<img src="${o.imageUrl}" alt="${o.name}">`:'—'}</td>
-            <td>
-              <select class="status-select">
-                <option value="por entregar" ${status==="por entregar"?'selected':''}>Por entregar</option>
-                <option value="entregado" ${status==="entregado"?'selected':''}>Entregado</option>
-                <option value="de baja" ${status==="de baja"?'selected':''}>De baja</option>
-              </select>
-            </td>
-            <td>
-              <button class="save-btn">Guardar</button>
-            </td>
-          </tr>`;
-      });
-      // Asignar listeners a Guardar
-      document.querySelectorAll("button.save-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const row = btn.closest("tr");
-          const id  = row.dataset.id;
-          const sel = row.querySelector("select.status-select");
-          const newStatus = sel.value;
-          // actualizar en Firestore
-          await updateDoc(doc(db, "objects", id), { status: newStatus });
-          // si entregado o de baja, quitar de la tabla
-          if (newStatus === "entregado" || newStatus === "de baja") {
-            row.remove();
-          }
-          alert("Estado actualizado a '" + newStatus + "'");
-        });
-      });
-    }
-
-    // Alta Objeto
+    // Subir objeto (mantener uploadToCloudinary si lo usas)
     document.getElementById("add-object-form")
       .addEventListener("submit", async e => {
         e.preventDefault();
-        const f           = e.target;
-        const name        = f["object-name"].value.trim();
-        const date        = f["object-date"].value;
-        const description = f["object-description"].value.trim();
-        const location    = f["object-location"].value.trim();
-        const fileInput   = f["object-image"];
-        let imageUrl      = "";
-
-        if (!name||!date||!description||!location)
-          return alert("Todos los campos excepto la imagen son obligatorios.");
-
-        if (fileInput.files.length) {
-          try {
-            imageUrl = await uploadToCloudinary(fileInput.files[0]);
-          } catch (err) {
-            return alert("Error al subir imagen: " + err.message);
-          }
+        const f = e.target;
+        const name = f["object-name"].value.trim();
+        const date = f["object-date"].value;
+        const desc = f["object-description"].value.trim();
+        const loc  = f["object-location"].value.trim();
+        let imageUrl = "";
+        if (f["object-image"].files.length) {
+          imageUrl = await uploadToCloudinary(f["object-image"].files[0]);
         }
-
+        if (!name||!date||!desc||!loc) return alert("Rellena todos los campos.");
         try {
           await addDoc(collection(db, "objects"), {
-            name, date, description, location,
+            name, date, description: desc, location: loc,
             imageUrl, status: "por entregar", createdAt: serverTimestamp()
           });
-          f.reset();
-          loadObjects();
+          f.reset(); loadObjects();
         } catch (err) {
-          console.error(err);
-          alert("Error agregando objeto: " + err.code);
+          console.error(err); alert("Error: "+err.code);
         }
       });
 
+    // Tabs y logout
+    window.switchTab = t => {
+      document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+      document.getElementById(`${t}-tab`).classList.add("active");
+      document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+      document.querySelector(`.tabs button[data-tab="${t}"]`).classList.add("active");
+    };
+    document.querySelectorAll(".tabs button")
+      .forEach(btn=>btn.addEventListener("click", ()=>switchTab(btn.dataset.tab)));
+    document.getElementById("logout-button")
+      .addEventListener("click", async ()=>{
+        await signOut(auth);
+        window.location.href = "../store/admin.html";
+      });
+
+    // Auth guard + carga inicial
+    onAuthStateChanged(auth, u => {
+      if (!u) return window.location.href = "../store/admin.html";
+      loadUsers(); loadObjects();
+    });
+
+    // Función de subida a Cloudinary (mismo código anterior)
+    async function uploadToCloudinary(file) {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("upload_preset", "ObjetosPerdidos");
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dplgx0sze/upload",
+        { method: "POST", body: form }
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message);
+      return json.secure_url;
+    }
   </script>
 </body>
 </html>
