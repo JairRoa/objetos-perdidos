@@ -35,11 +35,11 @@
   <style>
     /* Solo cambiamos el color de todo el texto a azul #2b4f97 */
     body,
-    h1, h2, h3, p, label, a, input, select, button {
+    h2, h3, p, label, a, input, select {
       color: #2b4f97 !important;
     }
 
-    /* Resto de los estilos sin modificar */
+
     body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; }
     header { background:#2e9d57; padding:1rem; text-align:center; position:relative; }
     header nav a { margin:0 1rem; text-decoration:none; font-weight:bold; }
@@ -48,12 +48,12 @@
     form { background:#fff; padding:1rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:2rem; }
     form { display:grid; gap:1rem; }
     input, select { width:100%; padding:.5rem; border:1px solid #ccc; border-radius:4px; }
-    button { padding:.75rem; background:#2e9d57; border:none; border-radius:5px; font-weight:bold; cursor:pointer; }
-    button:hover { background:#276e46; }
+    button { padding:.75rem; background:#2e9d57; border:none; border-radius:5px; font-weight:bold; cursor:pointer; color: #fff;}
+    button:hover { background:#f9d94e; }
     #codigo { display:none; margin-top:1rem; padding:1rem; background:#e8ffe8; border:1px solid #2e9d57; border-radius:5px; text-align:center; font-weight:bold; }
     footer { text-align:center; padding:1rem; background:#2e9d57; margin-top:2rem; }
     @media(max-width:768px){
-      header nav { display:flex; flex-direction:column; }
+      header nav { display:flex; flex-direction:column; color: #fff;}
       header nav a { margin: .5rem 0; }
     }
   </style>
@@ -165,6 +165,7 @@
 
         const templateParams = {
           email:   c,
+          reply_to:"logisyaudio@universidadean.edu.co",
           name:    n,
           title:   obj,
           message: `Código: ${code}
