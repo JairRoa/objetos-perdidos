@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Carrito – Objetos Perdidos</title>
+    <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
+  <title>Formulario – Objetos Perdidos</title>
 
   <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
@@ -129,9 +130,6 @@
       background: #2e9d57;
       color: #fff;
     }
-
-    /* QUIETO NAV EN MÓVIL */
-    /* Sin cambios: siempre fila */
   </style>
 </head>
 <body>
@@ -178,6 +176,18 @@
 
       <label for="cliente-correo">Correo institucional</label>
       <input type="email" id="cliente-correo" required />
+
+      <!-- Checkbox obligatorio para tratamiento de datos -->
+      <div>
+        <input type="checkbox" id="accept-data" required />
+        <label for="accept-data">
+          Acepto el 
+          <a href="https://universidadean.edu.co/sites/default/files/institucion/acuerdos/politica-tratamiento-de-datos-personales.pdf" 
+             target="_blank" rel="noopener">
+            tratamiento de datos
+          </a>
+        </label>
+      </div>
 
       <button type="submit">Enviar</button>
     </form>
@@ -229,6 +239,10 @@
     document.getElementById("client-form")
       .addEventListener("submit", async e => {
         e.preventDefault();
+        // Al menos el checkbox debe estar marcado
+        if (!document.getElementById("accept-data").checked) {
+          return alert("Debe aceptar el tratamiento de datos para continuar.");
+        }
         const n  = document.getElementById("cliente-nombre").value.trim();
         const dt = document.getElementById("cliente-doc").value;
         const id = document.getElementById("cliente-id").value.trim();
