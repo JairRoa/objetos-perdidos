@@ -214,6 +214,7 @@
           arr.push({ id: docSnap.id, ...o });
         }
       });
+      
       // ordenar por fecha descendente
       arr.sort((a, b) => {
         const ta = a.createdAt?.toDate?.() || 0;

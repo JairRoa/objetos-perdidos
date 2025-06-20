@@ -8,8 +8,7 @@ import {
   getAuth, onAuthStateChanged, createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-// ✅ Config Firebase (verifica que coincida con tu app web)
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
   authDomain: "objetosperdidos-76abd.firebaseapp.com",
@@ -30,7 +29,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Autenticación: redirección si no hay usuario
+// Autenticación
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     alert("No estás autenticado. Inicia sesión.");
@@ -41,7 +40,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Upload seguro a Cloudinary (firma generada por backend)
+// Upload seguro a Cloudinary
 async function uploadImage(file) {
   const timestamp = Math.floor(Date.now() / 1000);
   const res = await fetch("http://localhost:3000/get-signature", {

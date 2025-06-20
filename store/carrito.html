@@ -239,7 +239,9 @@
     document.getElementById("client-form")
       .addEventListener("submit", async e => {
         e.preventDefault();
-        // Al menos el checkbox debe estar marcado
+
+
+        // checkbox debe estar marcado
         if (!document.getElementById("accept-data").checked) {
           return alert("Debe aceptar el tratamiento de datos para continuar.");
         }

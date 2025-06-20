@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
+  <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
   <title>Inicio – Objetos Perdidos</title>
 
   <!-- Hoja de estilos global -->
@@ -11,11 +11,11 @@
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
-  <!-- ▸ Firebase JS SDK v11 (configuración idéntica) -->
+  <!-- ▸ Firebase JS SDK v11  -->
   <script type="module">
-    import { initializeApp }    from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAuth }          from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getFirestore }     from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth }       from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getFirestore }  from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
@@ -33,11 +33,16 @@
   </script>
 
   <style>
+    /* Evita desplazamiento horizontal */
+    html, body {
+      overflow-x: hidden;
+    }
+
     :root {
       --verde-principal: #2e9d57;
       --amarillo-abeja: #f9d94e;
-      --negro: #1a1a1a;
-      --blanco: #fefefe;
+      --negro:           #1a1a1a;
+      --blanco:          #fefefe;
     }
 
     * {
@@ -57,28 +62,41 @@
       padding: 1rem;
       display: flex;
       align-items: center;
-      justify-content: space-between;
     }
 
+    /* Logo a la izquierda */
+    .logo {
+      flex: 0 0 auto;
+    }
     .logo img {
       width: 120px;
       height: auto;
     }
 
+    /* Título centrado */
+    .navbar-title {
+      flex: 1 1 auto;
+      text-align: center;
+      color: var(--blanco);
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .navbar {
+      flex: 0 0 auto;
+    }
     .navbar ul {
       display: flex;
       gap: 1rem;
       list-style: none;
       align-items: center;
     }
-
     .navbar a {
       color: var(--blanco);
       font-weight: 700;
       text-decoration: none;
       transition: .3s;
     }
-
     .navbar a:hover {
       color: var(--amarillo-abeja);
     }
@@ -90,17 +108,22 @@
       border-radius: 5px;
       font-size: 16px;
     }
-
     .btn-explorar:hover {
       background: var(--blanco);
       transform: scale(1.05);
     }
 
     main {
-      padding: 2rem;
+      padding: 0 2rem 2rem;
       text-align: center;
     }
 
+    .img-banner {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-top: 0.5rem;
+    }
     .img-perdidos {
       display: block;
       margin: 2rem auto;
@@ -117,11 +140,15 @@
       color: var(--blanco);
     }
 
-    /* Full width en móviles */
     @media (max-width: 768px) {
+      .img-banner,
       .img-perdidos {
         width: 100%;
-        margin: 2rem 0;
+        margin: 1rem 0;
+      }
+      .navbar ul {
+        flex-wrap: wrap;
+        justify-content: center;
       }
     }
   </style>
@@ -132,11 +159,11 @@
     <div class="logo">
       <img src="img/logo.png" alt="Logo Objetos Perdidos" />
     </div>
-
+    <div class="navbar-title">Objetos Recuperados</div>
     <nav class="navbar">
       <ul>
         <li><a href="store/productos.html" class="btn-explorar">Busca tu objeto</a></li>
-        <li style="margin-left: auto;">
+        <li>
           <a href="store/admin.html" title="Iniciar Sesión">
             <i class="fa-solid fa-right-to-bracket fa-lg"></i>
           </a>
@@ -146,8 +173,10 @@
   </header>
 
   <main>
-    <h2>Encuentra tus objetos extraviados</h2>
-    <p>Si perdiste algo, aquí podrás verificar si lo encontraron.</p>
+    <!-- Banner a pleno ancho -->
+    <img src="img/banner.png" alt="Banner Objetos Perdidos" class="img-banner" />
+
+    <!-- Imagen existente -->
     <img src="img/perdidos.png" alt="Objetos Perdidos" class="img-perdidos" />
   </main>
 
