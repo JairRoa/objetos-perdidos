@@ -1,37 +1,49 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
 
-    // Helper para chequear admin
+    // Admin por custom claim o por rol en Firestore (compat)
     function isAdmin() {
-      return request.auth != null
-          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
     }
 
-    // Colección de usuarios
-    match /users/{userId} {
-      // Sólo usuarios autenticados pueden leer
-      allow read: if request.auth != null;
+    // ---------- USERS ----------
+    match /users/{uid} {
+      // Leer:
+      // - Admin puede leer a todos
+      // - Usuario solo su propio documento
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
 
-      // Crear: te puedes crear a ti mismo, o cualquiera con rol admin
-      allow create: if request.auth != null
-                   && (request.auth.uid == request.resource.data.uid
-                       || isAdmin());
+      // Crear / Borrar: solo admin
+      allow create, delete: if isAdmin();
 
-      // Actualizar/Borrar: sólo admins
-      allow update, delete: if isAdmin();
+      // Actualizar:
+      // - Admin puede actualizar cualquiera
+      // - Usuario solo su doc y NO puede cambiar su 'role'
+      allow update: if
+        isAdmin() ||
+        (
+          isSignedIn() &&
+          request.auth.uid == uid &&
+          (
+            // si envía 'role', debe quedar igual al actual
+            !( 'role' in request.resource.data ) ||
+            request.resource.data.role == resource.data.role
+          )
+        );
     }
 
-    // Colección de objetos
-    match /objects/{objectId} {
-      // Lectura pública
-      allow read: if true;
+    // ---------- OBJECTS ----------
+    match /objects/{id} {
+      // Lectura: autenticados
+      allow read: if isSignedIn();
 
-      // Crear: cualquier usuario autenticado
-      allow create: if request.auth != null;
-
-      // Actualizar/Borrar: sólo admins
-      allow update, delete: if isAdmin();
+      // Crear/Actualizar/Borrar: solo admin
+      allow create, update, delete: if isAdmin();
     }
 
     // Bloquea todo lo demás

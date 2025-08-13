@@ -4,225 +4,134 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#2e9d57" />
-
-    <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
+  <meta name="theme-color" content="#2e9d57" />
+  <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
   <title>Gestión de Usuarios y Objetos Perdidos</title>
+
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
   <style>
-  :root {
-    --verde-principal: #2e9d57;
-    --verde-claro:    #7dd081;
-    --amarillo-abeja: #f9d94e;
-    --rojo:           #d9534f;
-    --negro:          #1a1a1a;
-    --blanco:         #fefefe;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-  html, body { width:100%; overflow-x:hidden; }
-  body {
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    color: var(--negro);
-    display:flex; flex-direction:column; min-height:100vh;
-  }
+    :root {
+      --verde-principal: #2e9d57;
+      --verde-claro:    #7dd081;
+      --amarillo-abeja: #f9d94e;
+      --rojo:           #d9534f;
+      --negro:          #1a1a1a;
+      --blanco:         #fefefe;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+    html, body { width:100%; overflow-x:hidden; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: var(--negro);
+      display:flex; flex-direction:column; min-height:100vh;
+    }
 
-  /* --- HEADER --- */
-  header {
-    background: var(--verde-principal);
-    color: var(--blanco);
-    padding: 1rem; display:flex; flex-wrap:wrap;
-    align-items:center; justify-content:space-between;
-  }
-  .logo { font-size:1.5rem; font-weight:bold; flex:1 1 auto; }
-  .header-nav {
-    flex:1 1 auto;
-    display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
-  }
-  .header-nav a,
-  .header-nav button.logout {
-    flex:1 1 auto;
-    text-align:center;
-    padding:.5rem 1rem;
-    border-radius:5px;
-    font-weight:bold;
-    text-decoration:none;
-    transition:background .2s,color .2s;
-  }
-  .header-nav a {
-    background: var(--verde-claro);
-    color: var(--blanco);
-    border:none;
-  }
-  .header-nav a:hover {
-    background: var(--amarillo-abeja);
-    color: var(--negro);
-  }
-  .header-nav button.logout {
-    background: var(--rojo);
-    color: var(--blanco);
-    border:none;
-    cursor:pointer;
-  }
-  .header-nav button.logout:hover {
-    background: #c9302c;
-  }
+    header {
+      background: var(--verde-principal);
+      color: var(--blanco);
+      padding: 1rem; display:flex; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+    }
+    .logo { font-size:1.5rem; font-weight:bold; flex:1 1 auto; }
+    .header-nav {
+      flex:1 1 auto;
+      display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
+    }
+    .header-nav a,
+    .header-nav button.logout {
+      flex:1 1 auto;
+      text-align:center;
+      padding:.5rem 1rem;
+      border-radius:5px;
+      font-weight:bold;
+      text-decoration:none;
+      transition:background .2s,color .2s;
+    }
+    .header-nav a { background: var(--verde-claro); color: var(--blanco); border:none; }
+    .header-nav a:hover { background: var(--amarillo-abeja); color: var(--negro); }
+    .header-nav button.logout { background: var(--rojo); color: var(--blanco); border:none; cursor:pointer; }
+    .header-nav button.logout:hover { background:#c9302c; }
 
-  /* --- TABS --- */
-  .tabs {
-    display:flex; flex-wrap:wrap;
-    gap:.5rem; margin:1rem 0; width:100%;
-    justify-content:center;
-  }
-  .tabs button {
-    flex:1 1 45%;
-    padding:.75rem;
-    background: var(--amarillo-abeja);
-    color: var(--blanco);
-    border:none;
-    border-radius:5px;
-    font-weight:bold;
-    text-align:center;
-    transition:background .2s;
-    cursor:pointer;
-  }
-  .tabs button.active {
-    background: var(--verde-claro);
-  }
-  .tabs button:hover {
-    background: #f0c94a;
-  }
+    .tabs {
+      display:flex; flex-wrap:wrap;
+      gap:.5rem; margin:1rem 0; width:100%;
+      justify-content:center;
+    }
+    .tabs button {
+      flex:1 1 45%;
+      padding:.75rem;
+      background: var(--amarillo-abeja);
+      color: var(--blanco);
+      border:none;
+      border-radius:5px;
+      font-weight:bold;
+      text-align:center;
+      transition:background .2s;
+      cursor:pointer;
+    }
+    .tabs button.active { background: var(--verde-claro); }
+    .tabs button:hover { background:#f0c94a; }
 
-  /* --- MAIN & FORMULARIOS --- */
-  main {
-    flex:1; width:100%; max-width:960px;
-    margin:0 auto; padding:0 1rem;
-  }
-  section { display:none; }
-  section.active { display:block; }
-  .entity-form {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:1rem;
-    background:var(--blanco);
-    padding:1rem;
-    border-radius:8px;
-    margin-bottom:1rem;
-    width:100%;
-  }
-  .entity-form label { font-weight:bold; }
-  .entity-form input,
-  .entity-form select,
-  .entity-form textarea {
-    width:100%; padding:.5rem;
-    border:1px solid #ccc; border-radius:4px;
-  }
-  .entity-form button {
-    grid-column:span 2;
-    padding:.75rem;
-    background: var(--amarillo-abeja);
-    color: var(--blanco);
-    border:none;
-    border-radius:5px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:background .2s;
-  }
-  .entity-form button:hover {
-    background: var(--verde-claro);
-  }
+    main { flex:1; width:100%; max-width:960px; margin:0 auto; padding:0 1rem; }
+    section { display:none; }
+    section.active { display:block; }
 
-  /* --- TABLAS & PAGINACIÓN --- */
-  .table-wrapper { overflow-x:auto; margin-bottom:1rem; width:100%; }
-  table { width:100%; border-collapse:collapse; }
-  th, td {
-    padding:.75rem; border:1px solid #ddd; text-align:left;
-  }
-  th {
-    background: var(--amarillo-abeja); color: var(--blanco);
-  }
-  .pagination {
-    display:flex; flex-wrap:wrap;
-    gap:.5rem; justify-content:center;
-    margin-bottom:1rem; width:100%;
-  }
-  .pagination button {
-    padding:.4rem .6rem;
-    font-size:.9rem;
-    background: var(--blanco);
-    color: var(--negro);
-    border:1px solid var(--verde-principal);
-    border-radius:4px;
-    cursor:pointer;
-    transition:background .2s,color .2s;
-  }
-  .pagination button.current {
-    background: var(--verde-principal);
-    color: var(--blanco);
-    cursor: default;
-  }
-  .pagination button.disabled {
-    opacity:.5; cursor:default;
-  }
+    .entity-form {
+      display:grid; grid-template-columns:1fr 1fr; gap:1rem;
+      background:var(--blanco); padding:1rem; border-radius:8px; margin-bottom:1rem; width:100%;
+    }
+    .entity-form label { font-weight:bold; }
+    .entity-form input, .entity-form select, .entity-form textarea {
+      width:100%; padding:.5rem; border:1px solid #ccc; border-radius:4px;
+    }
+    .entity-form button {
+      grid-column:span 2; padding:.75rem; background: var(--amarillo-abeja);
+      color: var(--blanco); border:none; border-radius:5px; font-weight:bold; cursor:pointer; transition:background .2s;
+    }
+    .entity-form button[disabled] { opacity:.6; cursor:progress; }
+    .entity-form button:hover { background: var(--verde-claro); }
 
-  /* --- BOTONES DE ACCIÓN --- */
-  button.save-btn {
-    background: var(--verde-principal);
-    color: var(--blanco);
-    border:none; border-radius:4px;
-    padding:.4rem .8rem; cursor:pointer;
-    transition:background .2s;
-  }
-  button.save-btn:hover {
-    background: var(--verde-claro);
-  }
-  button.edit-btn {
-    background: var(--amarillo-abeja);
-    color: var(--blanco);
-    border:none; border-radius:4px;
-    padding:.4rem .8rem; cursor:pointer;
-    transition:background .2s;
-  }
-  button.edit-btn:hover {
-    background: #f0c94a;
-  }
-  button.delete-btn {
-    background: var(--rojo);
-    color: var(--blanco);
-    border:none; border-radius:4px;
-    padding:.4rem .8rem; cursor:pointer;
-    transition:background .2s;
-  }
-  button.delete-btn:hover {
-    background: #c9302c;
-  }
+    .admin-tools { display:flex; gap:.75rem; margin:.5rem 0 1rem; }
+    .admin-tools button {
+      padding:.5rem .75rem; border:none; border-radius:6px; font-weight:600; cursor:pointer;
+      background:#e8f5e9; color:#1b5e20; border:1px solid #c8e6c9;
+    }
+    .admin-tools button[disabled]{ opacity:.6; cursor:progress; }
 
-  /* --- FOOTER --- */
-  footer {
-    background: var(--verde-principal);
-    color: var(--blanco);
-    text-align:center;
-    padding:1rem;
-    width:100%;
-  }
+    .table-wrapper { overflow-x:auto; margin-bottom:1rem; width:100%; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:.75rem; border:1px solid #ddd; text-align:left; }
+    th { background: var(--amarillo-abeja); color: var(--blanco); }
 
+    .pagination { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; margin-bottom:1rem; width:100%; }
+    .pagination button {
+      padding:.4rem .6rem; font-size:.9rem; background: var(--blanco); color: var(--negro);
+      border:1px solid var(--verde-principal); border-radius:4px; cursor:pointer; transition:background .2s,color .2s;
+    }
+    .pagination button.current { background: var(--verde-principal); color: var(--blanco); cursor: default; }
+    .pagination button.disabled { opacity:.5; cursor:default; }
 
+    button.save-btn { background: var(--verde-principal); color: var(--blanco); border:none; border-radius:4px; padding:.4rem .8rem; cursor:pointer; }
+    button.save-btn:hover { background: var(--verde-claro); }
+    button.edit-btn { background: var(--amarillo-abeja); color: var(--blanco); border:none; border-radius:4px; padding:.4rem .8rem; cursor:pointer; }
+    button.edit-btn:hover { background:#f0c94a; }
+    button.delete-btn { background: var(--rojo); color: var(--blanco); border:none; border-radius:4px; padding:.4rem .8rem; cursor:pointer; }
+    button.delete-btn:hover { background:#c9302c; }
 
+    footer { background: var(--verde-principal); color: var(--blanco); text-align:center; padding:1rem; width:100%; }
 
-
-  /* --- RESPONSIVE --- */
-  @media (max-width: 600px) {
-    header { padding:.75rem; }
-    .tabs button { flex:1 1 100%; }
-    .entity-form { grid-template-columns:1fr; }
-    .entity-form button { grid-column:auto; }
-    th, td { padding:.5rem; font-size:.85rem; }
-    .pagination button { padding:.3rem .5rem; font-size:.8rem; }
-    footer { padding:.75rem; font-size:.8rem; }
-  }
-</style>
+    @media (max-width: 600px) {
+      .tabs button { flex:1 1 100%; }
+      .entity-form { grid-template-columns:1fr; }
+      .entity-form button { grid-column:auto; }
+      th, td { padding:.5rem; font-size:.85rem; }
+      .pagination button { padding:.3rem .5rem; font-size:.8rem; }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -240,27 +149,59 @@
   </div>
 
   <main>
+    <!-- USUARIOS -->
     <section id="users" class="active">
       <h2>Gestión de Usuarios</h2>
-      <form id="add-user-form" class="entity-form">
-        <div><label for="user-name">Nombre</label><input type="text" id="user-name" required /></div>
-        <div><label for="user-role">Rol</label>
+
+      <!-- Aviso para no-admin -->
+      <p id="users-warning" style="display:none; background:#fff3cd; color:#8a6d3b; border:1px solid #faebcc; padding:.6rem; border-radius:6px; margin:.5rem 0 1rem;">
+        No tienes permisos para ver la lista de usuarios. Solo puedes editar tu propio perfil.
+      </p>
+
+      <!-- Herramientas admin -->
+      <div class="admin-tools">
+        <button id="run-backfill" title="Sincroniza usuarios de Authentication a Firestore" style="display:none;">Sincronizar usuarios</button>
+      </div>
+
+      <form id="add-user-form" class="entity-form" autocomplete="off">
+        <div>
+          <label for="user-name">Nombre</label>
+          <input type="text" id="user-name" required />
+        </div>
+        <div>
+          <label for="user-role">Rol</label>
           <select id="user-role" required>
             <option value="user">Usuario</option>
             <option value="admin">Administrador</option>
           </select>
         </div>
-        <div><label for="user-email">Correo Electrónico</label><input type="email" id="user-email" required /></div>
-        <div><label for="user-phone">Teléfono</label><input type="tel" id="user-phone" required /></div>
-        <div><label for="user-password">Contraseña</label><input type="password" id="user-password" required /></div>
-        <div><label for="confirm-password">Confirmar Contraseña</label><input type="password" id="confirm-password" required /></div>
+        <div>
+          <label for="user-email">Correo Electrónico</label>
+          <input type="email" id="user-email" required />
+        </div>
+        <div>
+          <label for="user-phone">Teléfono</label>
+          <input type="tel" id="user-phone" required />
+        </div>
+        <div>
+          <label for="user-password">Contraseña</label>
+          <input type="password" id="user-password" />
+        </div>
+        <div>
+          <label for="confirm-password">Confirmar Contraseña</label>
+          <input type="password" id="confirm-password" />
+        </div>
+
         <input type="hidden" id="editing-user-id" />
         <button type="submit" id="submit-user-btn">Agregar Usuario</button>
       </form>
+
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr><th>#</th><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th><th>Acciones</th></tr>
+            <tr>
+              <th>#</th><th>Nombre</th><th>Rol</th><th>Correo</th><th>Teléfono</th><th>Acciones</th>
+            </tr>
           </thead>
           <tbody id="users-table-body"></tbody>
         </table>
@@ -268,23 +209,39 @@
       <div id="users-pagination" class="pagination"></div>
     </section>
 
+    <!-- OBJETOS -->
     <section id="objects-section">
       <h2>Gestión de Objetos</h2>
-      <form id="add-object-form" class="entity-form" enctype="multipart/form-data">
-        <div><label for="object-name">Nombre del Objeto</label><input type="text" id="object-name" required /></div>
-        <div><label for="object-date">Fecha de Recuperación</label><input type="date" id="object-date" required /></div>
-        <div><label for="object-description">Descripción</label><textarea id="object-description" rows="2" required></textarea></div>
-        <div><label for="object-location">Lugar de Encuentro</label><input type="text" id="object-location" required /></div>
+      <form id="add-object-form" class="entity-form" enctype="multipart/form-data" autocomplete="off">
+        <div>
+          <label for="object-name">Nombre del Objeto</label>
+          <input type="text" id="object-name" required />
+        </div>
+        <div>
+          <label for="object-date">Fecha de Recuperación</label>
+          <input type="date" id="object-date" required />
+        </div>
+        <div>
+          <label for="object-description">Descripción</label>
+          <textarea id="object-description" rows="2" required></textarea>
+        </div>
+        <div>
+          <label for="object-location">Lugar de Encuentro</label>
+          <input type="text" id="object-location" required />
+        </div>
         <div>
           <label for="object-image">Imagen del Objeto</label>
           <input type="file" id="object-image" accept="image/*" capture="environment" />
         </div>
-        <button type="submit">Agregar Objeto</button>
+        <button type="submit" id="submit-object-btn">Agregar Objeto</button>
       </form>
+
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr><th>#</th><th>Nombre</th><th>Fecha</th><th>Descripción</th><th>Lugar</th><th>Imagen</th><th>Estado</th><th>Acciones</th></tr>
+            <tr>
+              <th>#</th><th>Nombre</th><th>Fecha</th><th>Descripción</th><th>Lugar</th><th>Imagen</th><th>Estado</th><th>Acciones</th>
+            </tr>
           </thead>
           <tbody id="objects-table-body"></tbody>
         </table>
@@ -296,7 +253,7 @@
   <footer>&copy; 2025 Infraestructura y Planta Física.</footer>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
       getAuth, setPersistence, browserLocalPersistence,
       onAuthStateChanged, createUserWithEmailAndPassword, signOut
@@ -305,7 +262,11 @@
       getFirestore, collection, getDocs, doc, getDoc,
       setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import {
+      getFunctions, httpsCallable
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-functions.js";
 
+    // --- Config Firebase ---
     const firebaseConfig = {
       apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
       authDomain: "objetosperdidos-76abd.firebaseapp.com",
@@ -315,205 +276,385 @@
       appId: "1:609690831592:web:f7a276b069c426ef53175d",
       measurementId: "G-95C30B5EK1"
     };
+
+    // App principal (sesión admin/usuario)
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     setPersistence(auth, browserLocalPersistence);
     const db   = getFirestore(app);
 
-    document.querySelectorAll('.tabs button').forEach(btn=>{
+    // App secundario para crear usuarios sin cambiar sesión
+    const secondaryApp  = initializeApp(firebaseConfig, 'secondary');
+    const secondaryAuth = getAuth(secondaryApp);
+
+    // Functions
+    const functions = getFunctions(getApp());
+    const backfillUsersToFirestore = httpsCallable(functions, 'backfillUsersToFirestore');
+
+    // --- Utils ---
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    const esc = (s = "") => String(s)
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">", "&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#39;");
+    const enable = (el, yes=true) => { el.disabled = !yes; };
+
+    // Tabs
+    $$('.tabs button').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+        $$('.tabs button').forEach(x=>x.classList.remove('active'));
         btn.classList.add('active');
-        document.querySelectorAll('main > section').forEach(s=>s.classList.remove('active'));
+        $$('main > section').forEach(s=>s.classList.remove('active'));
         document.getElementById(btn.dataset.tab).classList.add('active');
       });
     });
 
-    document.getElementById('logout-btn').addEventListener('click', async ()=>{
-      await signOut(auth);
+    // Logout
+    $('#logout-btn').addEventListener('click', async ()=>{
+      await signOut(auth).catch(()=>{});
       window.location.href = '/store/admin.html';
     });
 
-    onAuthStateChanged(auth, user => {
-      if(!user) return window.location.href = '/store/admin.html';
-      loadUsers(); loadObjects();
+    // --- Estado global de rol ---
+    let IS_ADMIN = false;
+
+    // Estado auth
+    onAuthStateChanged(auth, async user => {
+      if (!user) return window.location.href = '/store/admin.html';
+
+      // 1) Intentar leer claim admin
+      try {
+        const token = await user.getIdTokenResult();
+        IS_ADMIN = !!token.claims?.admin;
+      } catch (_) { IS_ADMIN = false; }
+
+      // 2) Si no tiene claim, revisar Firestore /users/{uid}.role
+      if (!IS_ADMIN) {
+        try {
+          const meSnap = await getDoc(doc(db, 'users', user.uid));
+          const myRole = meSnap.exists() ? (meSnap.data().role || 'user') : 'user';
+          IS_ADMIN = (myRole === 'admin');
+        } catch (_) { IS_ADMIN = false; }
+      }
+
+      const usersSection = document.getElementById('users');
+      const form = document.getElementById('add-user-form');
+      const submitBtn = document.getElementById('submit-user-btn');
+      const warning = document.getElementById('users-warning');
+      const backfillBtn = document.getElementById('run-backfill');
+
+      if (IS_ADMIN) {
+        // Admin: todo visible
+        warning.style.display = 'none';
+        if (backfillBtn) {
+          backfillBtn.style.display = 'inline-block';
+          backfillBtn.onclick = async ()=>{
+            enable(backfillBtn, false); backfillBtn.textContent = 'Sincronizando...';
+            try {
+              const r = await backfillUsersToFirestore(); // requiere callable deploy
+              alert(`Backfill finalizado. Creados: ${r.data?.created ?? 0}`);
+              await loadUsers();
+            } catch(e) {
+              console.error(e);
+              alert('Error ejecutando backfill. Verifica que la Function exista y tu usuario tenga claim admin:true.');
+            } finally {
+              enable(backfillBtn, true); backfillBtn.textContent = 'Sincronizar usuarios';
+            }
+          };
+        }
+        loadUsers();
+      } else {
+        // NO admin:
+        // - Ocultar tabla+pag y botón backfill
+        document.querySelector('.table-wrapper').style.display = 'none';
+        document.getElementById('users-pagination').style.display = 'none';
+        if (backfillBtn) backfillBtn.style.display = 'none';
+        // - Mensaje
+        warning.style.display = 'block';
+        // - Botón
+        submitBtn.textContent = 'Actualizar mi perfil';
+        // - Bloquear cambios de rol y correo
+        document.getElementById('user-role').disabled = true;
+        document.getElementById('user-email').disabled = true;
+        // - Cargar datos propios
+        try {
+          const meSnap = await getDoc(doc(db, 'users', user.uid));
+          const d = meSnap.exists() ? meSnap.data() : {};
+          document.getElementById('user-name').value  = d.name || user.displayName || '';
+          document.getElementById('user-role').value  = d.role || 'user';
+          document.getElementById('user-email').value = d.email || user.email || '';
+          document.getElementById('user-phone').value = d.phone || '';
+          document.getElementById('editing-user-id').value = user.uid;
+        } catch (e) {
+          console.error(e);
+          alert('No fue posible cargar tu perfil.');
+        }
+      }
+
+      // Objetos (para todos autenticados)
+      loadObjects();
     });
 
+    // --- Paginación ---
     const ITEMS_PER_PAGE = 50;
     function paginate(items, page, renderFn, container, pager){
-      const total = Math.ceil(items.length/ITEMS_PER_PAGE);
+      const total = Math.max(1, Math.ceil(items.length/ITEMS_PER_PAGE));
       container.innerHTML = '';
       const start = (page-1)*ITEMS_PER_PAGE;
-      items.slice(start,start+ITEMS_PER_PAGE).forEach((it,i)=>renderFn(it,start+i+1));
+      items.slice(start, start+ITEMS_PER_PAGE).forEach((it,i)=>renderFn(it, start+i+1));
       pager.innerHTML = '';
-      function mk(lbl,p){
+
+      const mk = (lbl,p)=>{
         const b = document.createElement('button');
         b.textContent = lbl;
         if(p<1||p>total) b.classList.add('disabled');
         else if(p===page) b.classList.add('current');
         else b.onclick = ()=>paginate(items,p,renderFn,container,pager);
         pager.append(b);
-      }
+      };
       mk('«',page-1);
       for(let i=1;i<=total;i++) mk(i,i);
       mk('»',page+1);
     }
 
-
-
-
-    
-    // Usuarios
+    // ===================== USUARIOS =====================
     let users=[];
-    const uBody=document.getElementById('users-table-body'),
-          uPager=document.getElementById('users-pagination');
+    const uBody  = document.getElementById('users-table-body');
+    const uPager = document.getElementById('users-pagination');
+
     async function loadUsers(){
       users=[];
-      (await getDocs(collection(db,'users')))
-        .forEach(d=>users.push({id:d.id,...d.data()}));
-      users.sort((a,b)=>(b.createdAt?.toMillis()||0)-(a.createdAt?.toMillis()||0));
+      const snap = await getDocs(collection(db,'users'));
+      snap.forEach(d=>users.push({id:d.id, ...d.data()}));
+      users.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
       paginate(users,1,renderUser,uBody,uPager);
     }
-    function renderUser(u,idx){
-      uBody.insertAdjacentHTML('beforeend',`
-        <tr data-id="${u.id}">
-          <td>${idx}</td><td>${u.name}</td><td>${u.role}</td>
-          <td>${u.email}</td><td>${u.phone}</td>
+
+    function renderUser(u, idx){
+      uBody.insertAdjacentHTML('beforeend', `
+        <tr data-id="${esc(u.id)}">
+          <td>${idx}</td>
+          <td>${esc(u.name)}</td>
+          <td>${esc(u.role)}</td>
+          <td>${esc(u.email)}</td>
+          <td>${esc(u.phone)}</td>
           <td>
             <button class="edit-btn">Editar</button>
             <button class="delete-btn">Eliminar</button>
           </td>
-        </tr>`);
-      attachUserListeners();
+        </tr>
+      `);
     }
-    function attachUserListeners(){
-      uBody.querySelectorAll('.edit-btn').forEach(b=>{
-        b.onclick=async()=>{
-          const id=b.closest('tr').dataset.id;
-          const d=(await getDoc(doc(db,'users',id))).data();
-          document.getElementById('user-name').value=d.name;
-          document.getElementById('user-role').value=d.role;
-          document.getElementById('user-email').value=d.email;
-          document.getElementById('user-phone').value=d.phone;
-          document.getElementById('user-password').value='';
-          document.getElementById('confirm-password').value='';
-          document.getElementById('editing-user-id').value=id;
+
+    // Delegación Users (solo admins tienen tabla visible; reforzamos aquí)
+    uBody.addEventListener('click', async (ev)=>{
+      if (!IS_ADMIN) return; // no-admin no debe llegar aquí
+      const btn = ev.target.closest('button'); if (!btn) return;
+      const row = btn.closest('tr'); const id = row?.dataset?.id; if (!id) return;
+
+      if (btn.classList.contains('edit-btn')) {
+        try {
+          const d = (await getDoc(doc(db,'users',id))).data();
+          if (!d) return alert('No se encontró el usuario.');
+          document.getElementById('user-name').value  = d.name || '';
+          document.getElementById('user-role').value  = d.role || 'user';
+          document.getElementById('user-email').value = d.email || '';
+          document.getElementById('user-phone').value = d.phone || '';
+          document.getElementById('user-password').value = '';
+          document.getElementById('confirm-password').value = '';
+          document.getElementById('editing-user-id').value = id;
           document.getElementById('submit-user-btn').textContent='Actualizar Usuario';
-        };
-      });
-      uBody.querySelectorAll('.delete-btn').forEach(b=>{
-        b.onclick=async()=>{
-          if(!confirm('¿Estás seguro que quieres eliminar este usuario?')) return;
-          await deleteDoc(doc(db,'users',b.closest('tr').dataset.id));
-          loadUsers();
-        };
-      });
-    }
-    document.getElementById('add-user-form')
-      .addEventListener('submit',async e=>{
-      e.preventDefault();
-      const id   = document.getElementById('editing-user-id').value;
-      const name = document.getElementById('user-name').value.trim();
-      const role = document.getElementById('user-role').value;
-      const email= document.getElementById('user-email').value.trim();
-      const phone= document.getElementById('user-phone').value.trim();
-      const pwd  = document.getElementById('user-password').value;
-      const pwd2 = document.getElementById('confirm-password').value;
-      if(!name||!role||!email||!phone||!pwd||!pwd2)
-        return alert('Todos los campos son obligatorios.');
-      if(pwd!==pwd2) return alert('Las contraseñas no coinciden.');
-      if(id){
-        await updateDoc(doc(db,'users',id),{name,role,email,phone});
-        alert('Usuario actualizado.');
-      } else {
-        const cred=await createUserWithEmailAndPassword(auth,email,pwd);
-        await setDoc(doc(db,'users',cred.user.uid),{
-          uid:cred.user.uid,name,role,email,phone,createdAt:serverTimestamp()
-        });
-        alert('Usuario creado.');
+          // Habilitar campos rol/email para admin
+          document.getElementById('user-role').disabled = false;
+          document.getElementById('user-email').disabled = false;
+        } catch(e) {
+          console.error(e); alert('Error cargando usuario.');
+        }
       }
-      e.target.reset();
-      document.getElementById('editing-user-id').value='';
-      document.getElementById('submit-user-btn').textContent='Agregar Usuario';
-      loadUsers();
+
+      if (btn.classList.contains('delete-btn')) {
+        if(!confirm('¿Eliminar este registro de Firestore? (No borra la cuenta en Authentication)')) return;
+        try {
+          await deleteDoc(doc(db,'users',id));
+          loadUsers();
+        } catch(e) {
+          console.error(e); alert('Error eliminando usuario.');
+        }
+      }
     });
 
+    // Submit crear/actualizar usuario
+    document.getElementById('add-user-form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-user-btn'); enable(submitBtn, false);
 
+      const id    = document.getElementById('editing-user-id').value;
+      const name  = document.getElementById('user-name').value.trim();
+      const role  = document.getElementById('user-role').value;
+      const email = document.getElementById('user-email').value.trim();
+      const phone = document.getElementById('user-phone').value.trim();
+      const pwd   = document.getElementById('user-password').value;
+      const pwd2  = document.getElementById('confirm-password').value;
 
+      if (!name || !email || !phone) {
+        alert('Nombre, correo y teléfono son obligatorios.');
+        return enable(submitBtn, true);
+      }
 
-    // Objetos
+      // No-admin: solo puede actualizar su propio perfil (sin cambiar rol/correo)
+      if (!IS_ADMIN) {
+        if (!id) { alert('No tienes permisos para crear usuarios.'); return enable(submitBtn, true); }
+        const currentUid = auth.currentUser?.uid;
+        if (id !== currentUid) { alert('Solo puedes editar tu propio perfil.'); return enable(submitBtn, true); }
+      }
+
+      try {
+        if (id) {
+          // Actualizar
+          if (IS_ADMIN) {
+            await updateDoc(doc(db,'users',id), { name, role, email, phone });
+            alert('Usuario actualizado.');
+          } else {
+            await updateDoc(doc(db,'users',id), { name, phone });
+            alert('Perfil actualizado.');
+          }
+        } else {
+          // Crear (solo admin)
+          if (!IS_ADMIN) {
+            alert('No tienes permisos para crear usuarios.');
+          } else {
+            if (!pwd || !pwd2) { alert('Define y confirma la contraseña.'); return enable(submitBtn, true); }
+            if (pwd !== pwd2)  { alert('Las contraseñas no coinciden.');  return enable(submitBtn, true); }
+
+            const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pwd);
+            await setDoc(doc(db,'users',cred.user.uid), {
+              uid: cred.user.uid, name, role, email, phone, createdAt: serverTimestamp()
+            });
+            try { await signOut(secondaryAuth); } catch(_) {}
+            alert('Usuario creado.');
+          }
+        }
+
+        // Reset y recarga si es admin (tiene tabla)
+        e.target.reset();
+        document.getElementById('editing-user-id').value = '';
+        document.getElementById('submit-user-btn').textContent = IS_ADMIN ? 'Agregar Usuario' : 'Actualizar mi perfil';
+        if (IS_ADMIN) loadUsers();
+      } catch (err) {
+        console.error(err);
+        const code = err?.code || '';
+        if (code === 'auth/email-already-in-use') alert('Ese correo ya está registrado.');
+        else if (code === 'auth/invalid-email')   alert('Correo inválido.');
+        else if (code === 'auth/weak-password')   alert('La contraseña es muy débil.');
+        else if (code === 'permission-denied')    alert('Permiso denegado. Revisa reglas/claims.');
+        else alert('Ocurrió un error al guardar el usuario.');
+      } finally {
+        enable(submitBtn, true);
+      }
+    });
+
+    // ===================== OBJETOS =====================
     let objects=[];
-    const oBody=document.getElementById('objects-table-body'),
-          oPager=document.getElementById('objects-pagination');
+    const oBody  = document.getElementById('objects-table-body');
+    const oPager = document.getElementById('objects-pagination');
+
     async function loadObjects(){
       objects=[];
-      (await getDocs(collection(db,'objects')))
-        .forEach(d=>objects.push({id:d.id,...d.data()}));
-      objects.sort((a,b)=>(b.createdAt?.toMillis()||0)-(a.createdAt?.toMillis()||0));
+      const snap = await getDocs(collection(db,'objects'));
+      snap.forEach(d=>objects.push({id:d.id, ...d.data()}));
+      objects.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
       paginate(objects,1,renderObject,oBody,oPager);
     }
-    function renderObject(o,idx){
-      oBody.insertAdjacentHTML('beforeend',`
-        <tr data-id="${o.id}">
-          <td>${idx}</td><td>${o.name}</td><td>${o.date}</td>
-          <td>${o.description}</td><td>${o.location}</td>
-          <td>${o.imageUrl?`<img src="${o.imageUrl}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">`:'—'}</td>
-          <td><select class="status-select">
-            <option value="por entregar"${o.status==='por entregar'?' selected':''}>Por entregar</option>
-            <option value="entregado"${o.status==='entregado'?' selected':''}>Entregado</option>
-            <option value="de baja"${o.status==='de baja'?' selected':''}>De baja</option>
-          </select></td>
-          <td><button class="save-btn">Guardar</button><button class="delete-btn">Eliminar</button></td>
-        </tr>`);
-      attachObjectListeners();
+
+    function renderObject(o, idx){
+      oBody.insertAdjacentHTML('beforeend', `
+        <tr data-id="${esc(o.id)}">
+          <td>${idx}</td>
+          <td>${esc(o.name)}</td>
+          <td>${esc(o.date)}</td>
+          <td>${esc(o.description)}</td>
+          <td>${esc(o.location)}</td>
+          <td>${o.imageUrl ? `<img src="${esc(o.imageUrl)}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">` : '—'}</td>
+          <td>
+            <select class="status-select">
+              <option value="por entregar"${o.status==='por entregar'?' selected':''}>Por entregar</option>
+              <option value="entregado"${o.status==='entregado'?' selected':''}>Entregado</option>
+              <option value="de baja"${o.status==='de baja'?' selected':''}>De baja</option>
+            </select>
+          </td>
+          <td>
+            <button class="save-btn">Guardar</button>
+            <button class="delete-btn">Eliminar</button>
+          </td>
+        </tr>
+      `);
     }
-    function attachObjectListeners(){
-      oBody.querySelectorAll('.save-btn').forEach(b=>{
-        b.onclick=async()=>{
-          const row=b.closest('tr'),
-                id=row.dataset.id,
-                status=row.querySelector('.status-select').value;
-          await updateDoc(doc(db,'objects',id),{status});
-          if(status!=='por entregar') row.remove();
+
+    // Delegación Objetos
+    oBody.addEventListener('click', async (ev)=>{
+      const btn = ev.target.closest('button'); if (!btn) return;
+      const row = btn.closest('tr'); const id = row?.dataset?.id; if (!id) return;
+
+      if (btn.classList.contains('save-btn')) {
+        try {
+          const status = row.querySelector('.status-select').value;
+          await updateDoc(doc(db,'objects',id), { status });
+          if (status !== 'por entregar') row.remove();
           alert('Estado actualizado.');
-        };
-      });
-      oBody.querySelectorAll('.delete-btn').forEach(b=>{
-        b.onclick=async()=>{
-          if(!confirm('¿Estás seguro que quieres eliminar este objeto?')) return;
-          await deleteDoc(doc(db,'objects',b.closest('tr').dataset.id));
-          loadObjects();
-        };
-      });
-    }
-    document.getElementById('add-object-form')
-      .addEventListener('submit',async e=>{
-      e.preventDefault();
-      const f=e.target,
-            name=f['object-name'].value.trim(),
-            date=f['object-date'].value,
-            desc=f['object-description'].value.trim(),
-            loc=f['object-location'].value.trim(),
-            file=f['object-image'].files[0];
-      if(!name||!date||!desc||!loc)
-        return alert('Todos los campos excepto imagen son obligatorios.');
-      let imageUrl='';
-      if(file){
-        const fd=new FormData();
-        fd.append('file',file);
-        fd.append('upload_preset','ObjetosPerdidos');
-        const res=await fetch('https://api.cloudinary.com/v1_1/dplgx0sze/upload',{method:'POST',body:fd});
-        const js=await res.json();
-        imageUrl=js.secure_url;
+        } catch(e) { console.error(e); alert('Error actualizando estado.'); }
       }
-      await addDoc(collection(db,'objects'),{
-        name,date,description:desc,location:loc,
-        imageUrl,status:'por entregar',createdAt:serverTimestamp()
-      });
-      alert('Objeto agregado.');
-      f.reset();
-      loadObjects();
+
+      if (btn.classList.contains('delete-btn')) {
+        if(!confirm('¿Eliminar este objeto?')) return;
+        try { await deleteDoc(doc(db,'objects',id)); loadObjects(); }
+        catch(e) { console.error(e); alert('Error eliminando objeto.'); }
+      }
     });
+
+    // Submit objetos
+    document.getElementById('add-object-form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-object-btn'); enable(submitBtn, false);
+
+      const f = e.target;
+      const name = f['object-name'].value.trim();
+      const date = f['object-date'].value;
+      const desc = f['object-description'].value.trim();
+      const loc  = f['object-location'].value.trim();
+      const file = f['object-image'].files[0];
+
+      if(!name||!date||!desc||!loc){
+        alert('Todos los campos excepto imagen son obligatorios.');
+        return enable(submitBtn, true);
+      }
+
+      try {
+        let imageUrl = '';
+        if(file){
+          const fd = new FormData();
+          fd.append('file', file);
+          fd.append('upload_preset', 'ObjetosPerdidos');
+          const res = await fetch('https://api.cloudinary.com/v1_1/dplgx0sze/upload', { method:'POST', body: fd });
+          const js  = await res.json();
+          imageUrl  = js.secure_url || '';
+        }
+
+        await addDoc(collection(db,'objects'),{
+          name, date, description: desc, location: loc,
+          imageUrl, status: 'por entregar', createdAt: serverTimestamp()
+        });
+
+        alert('Objeto agregado.');
+        f.reset();
+        loadObjects();
+      } catch (err) {
+        console.error(err);
+        alert('Error agregando el objeto.');
+      } finally {
+        enable(submitBtn, true);
+      }
+    });
+
   </script>
 </body>
 </html>
