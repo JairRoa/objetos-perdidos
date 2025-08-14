@@ -4,160 +4,140 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#2e9d57" />
-
-    <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
+  <meta name="theme-color" content="#2e9d57" />
+  <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
   <title>Objetos Perdidos</title>
+
   <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+
   <style>
-    :root {
-      --verde-principal: #2e9d57;
-      --verde-claro:    #7dd081;
-      --amarillo-abeja: #f9d94e;
-      --azul-oscuro:    #2b4f97;
-      --negro:          #1a1a1a;
-      --blanco:         #fefefe;
+    :root{
+      --verde-principal:#2e9d57;
+      --verde-claro:#7dd081;
+      --amarillo-abeja:#f9d94e;
+      --azul-oscuro:#2b4f97;
+      --negro:#1a1a1a;
+      --blanco:#fff;
     }
-    *, *::before, *::after {
-      margin: 0; padding: 0;
-      box-sizing: border-box;
-    }
-    body {
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{
       font-family: Arial, sans-serif;
       color: var(--negro);
       background: url("../img/background.png") no-repeat center center fixed;
       background-size: cover;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
     }
 
-    /* HEADER */
-    header {
-      background: var(--verde-principal);
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--blanco);
+    /* Header */
+    header{
+      background:var(--verde-principal);
+      color:var(--blanco);
+      padding:1rem;
+      display:flex; align-items:center; justify-content:space-between;
     }
-    header h1 {
-      font-size: 2rem;
+    header h1{font-size:2rem}
+    header nav{display:flex; gap:1rem; align-items:center}
+    header nav a{color:#fff; text-decoration:none; font-weight:700}
+    header nav a:hover{color:var(--amarillo-abeja)}
+
+    main{width:100%; max-width:1200px; margin:0 auto; padding:1.25rem 1rem; flex:1}
+
+    /* Search bar */
+    .search-row{
+      display:flex; gap:.6rem; align-items:center; margin: .75rem 0 1.2rem;
+      flex-wrap:wrap; justify-content:center;
     }
-    header nav {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    .search-row input[type="text"]{
+      flex:1 1 680px;
+      max-width:960px;
+      padding:.75rem .9rem;
+      border:1px solid #ccc;
+      border-radius:8px;
+      background:rgba(255,255,255,.95);
+      outline:none;
     }
-    header nav a {
-      color: var(--blanco);
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s;
+    .btn{
+      padding:.7rem 1rem; border-radius:8px; border:1px solid transparent; cursor:pointer;
+      font-weight:700;
     }
-    header nav a:hover {
-      color: var(--amarillo-abeja);
+    .btn-primary{background:var(--verde-principal); color:#fff}
+    .btn-primary:hover{background:#25874a}
+    .btn-light{background:#fff; color:#333; border-color:#ddd}
+    .btn-light:hover{background:#f3f3f3}
+
+    h2{
+      color:var(--azul-oscuro);
+      text-align:center;
+      margin:.6rem 0 1rem;
     }
 
-    main {
-      padding: 2rem;
-      text-align: center;
+    /* Lista tarjetas con estilos anteriores */
+    #productos-lista{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(260px,1fr));
+      gap:1rem;
     }
-    .productos h2 {
-      color: var(--azul-oscuro);
-      margin-bottom: 1rem;
+    .card{
+      display:flex;
+      flex-direction:column;
+      background:#fff;
+      border-radius:8px;
+      border:1px solid #ddd;
+      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      overflow:hidden;
+      transition:transform 0.2s ease, box-shadow 0.2s ease;
     }
-    #productos-lista {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 4px 12px rgba(0,0,0,0.15);
     }
-    .producto {
-      background: var(--blanco);
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 280px;
-      padding: 1rem;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
+    .card-img{
+      width:100%;
+      height:180px;
+      object-fit:cover;
+      border-bottom:1px solid #ddd;
+      background:#f6f6f6;
     }
-    .producto img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-radius: 5px;
+    .card-body{padding:0.9rem}
+    .card-title{
+      font-size:1.1rem; margin:0 0 .5rem; font-weight:700; color:#333;
     }
-    .producto h3 {
-      margin: .5rem 0;
-      color: var(--verde-principal);
-      font-size: 1.1rem;
+    .card-meta{
+      margin:.25rem 0; font-size:.92rem; color:#555;
     }
-    .producto p {
-      margin: .25rem 0;
-      font-size: .9rem;
-      flex-grow: 1;
+    .reclamar{
+      margin:.9rem; padding:.5rem .8rem;
+      background-color:#ffc107; color:#000; border:none; border-radius:6px;
+      cursor:pointer; font-weight:700; transition:background-color .2s ease;
+      align-self:flex-start;
     }
-    .reclamar-btn {
-      background: var(--amarillo-abeja);
-      color: var(--negro);
-      border: none;
-      border-radius: 5px;
-      padding: .5rem;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: center;
-      transition: background .3s, transform .2s;
-      margin-top: 1rem;
+    .reclamar:hover{background-color:#e0a800}
+
+    /* Paginación */
+    .pagination{
+      display:flex; flex-wrap:wrap; gap:.35rem; justify-content:center; margin:1.1rem 0;
     }
-    .reclamar-btn:hover {
-      background: var(--verde-claro);
-      transform: scale(1.03);
+    .pagination button{
+      min-width:38px; padding:.45rem .65rem; border:1px solid var(--verde-principal);
+      background:#fff; color:#000; border-radius:6px; cursor:pointer; font-weight:700;
+    }
+    .pagination button:hover{background:var(--verde-principal); color:#fff}
+    .pagination .current{background:var(--verde-principal); color:#fff; cursor:default}
+    .pagination .disabled{opacity:.5; cursor:default}
+
+    footer{
+      text-align:center; padding:1rem; background:var(--verde-principal); color:#fff;
+      margin-top:auto;
     }
 
-    /* PAGINACIÓN */
-    #pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: .5rem;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-    #pagination button {
-      background: var(--blanco);
-      color: var(--negro);
-      border: 1px solid var(--verde-principal);
-      border-radius: 4px;
-      padding: .4rem .8rem;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background .2s, color .2s;
-    }
-    #pagination button:hover {
-      background: var(--verde-principal);
-      color: var(--blanco);
-    }
-    #pagination button.disabled {
-      opacity: .5;
-      cursor: default;
-    }
-    #pagination button.current {
-      background: var(--verde-principal);
-      color: var(--blanco);
-      cursor: default;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background: var(--verde-principal);
-      color: var(--blanco);
-      margin-top: 2rem;
-    }
+    .center{display:flex; justify-content:center; align-items:center}
+    .muted{color:#666}
   </style>
 </head>
 <body>
-
   <header>
     <h1>Objetos Perdidos</h1>
     <nav>
@@ -169,27 +149,33 @@
   </header>
 
   <main>
-    <section class="productos">
-      <h2>Últimos Objetos Registrados</h2>
-      <div id="productos-lista">
-        <p>Cargando objetos...</p>
-      </div>
-      <div id="pagination"></div>
-    </section>
+    <!-- Buscador -->
+    <div class="search-row">
+      <input id="q" type="text" placeholder="Buscar por palabra (nombre, descripción o lugar)…" maxlength="80" aria-label="Buscar objetos"/>
+      <button id="btn-search" class="btn btn-primary" type="button">Buscar</button>
+      <button id="btn-clear" class="btn btn-light" type="button">Limpiar</button>
+    </div>
+
+    <h2>Últimos Objetos Registrados</h2>
+
+    <!-- Lista -->
+    <div id="productos-lista" aria-live="polite">
+      <p class="center muted" style="grid-column:1/-1">Cargando objetos…</p>
+    </div>
+
+    <!-- Paginación -->
+    <div id="pagination" class="pagination" aria-label="Paginación"></div>
   </main>
 
-  <footer>
-    <p>&copy; 2025 Infraestructura y Planta Física.</p>
-  </footer>
+  <footer>&copy; 2025 Infraestructura y Planta Física.</footer>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import {
-      getFirestore,
-      collection,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+      getFirestore, collection, getDocs
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
+    /* ---------- Config Firebase ---------- */
     const firebaseConfig = {
       apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
       authDomain: "objetosperdidos-76abd.firebaseapp.com",
@@ -202,88 +188,191 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    const ITEMS_PER_PAGE = 20;
-    let objetos = [];
-    let currentPage = 1;
-    const listaEl = document.getElementById("productos-lista");
-    const pagEl   = document.getElementById("pagination");
+    /* ---------- Utilidades ---------- */
+    const $ = (s, r=document)=> r.querySelector(s);
+    const $$ = (s, r=document)=> Array.from(r.querySelectorAll(s));
+    const esc = (v="") => String(v)
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#39;");
 
-    async function fetchObjetos() {
-      const snap = await getDocs(collection(db, "objects"));
-      const arr = [];
-      snap.forEach(docSnap => {
-        const o = docSnap.data();
-        if (o.status === "por entregar") {
-          arr.push({ id: docSnap.id, ...o });
-        }
+    const formatDate = ts => {
+      try{
+        const d = ts?.toDate?.() ?? null;
+        return d ? d.toLocaleString("es-CO",{dateStyle:"medium", timeStyle:"short"}) : "";
+      }catch{ return ""; }
+    };
+
+    /* ---------- Estado ---------- */
+    const ITEMS_PER_PAGE = 20;
+    let allObjects = [];       // todos los "por entregar"
+    let filtered = [];         // filtro actual
+    let currentPage = 1;
+
+    const listEl = $("#productos-lista");
+    const pagerEl = $("#pagination");
+    const inputQ = $("#q");
+    const btnSearch = $("#btn-search");
+    const btnClear = $("#btn-clear");
+
+    /* ---------- Carga de datos ---------- */
+    async function fetchObjects(){
+      listEl.innerHTML = `<p class="center muted" style="grid-column:1/-1">Cargando objetos…</p>`;
+      try{
+        const snap = await getDocs(collection(db,"objects"));
+        const tmp = [];
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          if ((d?.status||"").toLowerCase() === "por entregar"){
+            tmp.push({
+              id: docSnap.id,
+              name: d?.name || "",
+              description: d?.description || "",
+              location: d?.location || "",
+              imageUrl: d?.imageUrl || "",
+              createdAt: d?.createdAt || null
+            });
+          }
+        });
+        // ordenar por fecha desc.
+        tmp.sort((a,b)=>{
+          const ta = a.createdAt?.toMillis?.() ?? 0;
+          const tb = b.createdAt?.toMillis?.() ?? 0;
+          return tb - ta;
+        });
+
+        allObjects = tmp;
+        applyFilter(); // render inicial
+      }catch(err){
+        console.error(err);
+        listEl.innerHTML = "";
+        const box = document.createElement("div");
+        box.className = "center";
+        box.style.gridColumn = "1 / -1";
+        box.innerHTML = `<span class="muted">No fue posible cargar los objetos.</span>`;
+        const retry = document.createElement("button");
+        retry.type = "button";
+        retry.className = "btn btn-light";
+        retry.style.marginLeft = ".5rem";
+        retry.textContent = "Reintentar";
+        retry.addEventListener("click", fetchObjects);
+        box.appendChild(retry);
+        listEl.appendChild(box);
+      }
+    }
+
+    /* ---------- Filtro ---------- */
+    function applyFilter(){
+      const q = inputQ.value.trim().toLowerCase();
+      filtered = !q ? allObjects : allObjects.filter(o=>{
+        const hay = [o.name, o.description, o.location]
+          .map(x=>String(x||"").toLowerCase())
+          .some(text => text.includes(q));
+        return hay;
       });
-      
-      // ordenar por fecha descendente
-      arr.sort((a, b) => {
-        const ta = a.createdAt?.toDate?.() || 0;
-        const tb = b.createdAt?.toDate?.() || 0;
-        return tb - ta;
-      });
-      objetos = arr;
-      renderPage(1);
+      currentPage = 1;
+      render();
+    }
+
+    /* ---------- Render ---------- */
+    function render(){
+      renderCards();
       renderPagination();
     }
 
-    function renderPage(page) {
-      currentPage = page;
-      const start = (page - 1) * ITEMS_PER_PAGE;
-      const end   = start + ITEMS_PER_PAGE;
-      const slice = objetos.slice(start, end);
-
-      listaEl.innerHTML = "";
-      if (slice.length === 0) {
-        listaEl.innerHTML = "<p>No hay objetos por entregar.</p>";
+    function renderCards(){
+      listEl.innerHTML = "";
+      if (!filtered.length){
+        const p = document.createElement("p");
+        p.className = "center muted";
+        p.style.gridColumn = "1 / -1";
+        p.textContent = "No hay objetos para mostrar.";
+        listEl.appendChild(p);
         return;
       }
-      slice.forEach(o => {
-        const nameEnc = encodeURIComponent(o.name);
-        listaEl.innerHTML += `
-          <div class="producto">
-            <img src="${o.imageUrl||'https://via.placeholder.com/300'}" alt="${o.name}" />
-            <h3>${o.name}</h3>
-            <p><strong>Fecha registro:</strong> ${o.createdAt?.toDate().toLocaleString("es-CO")||""}</p>
-            <p><strong>Descripción:</strong> ${o.description}</p>
-            <p><strong>Lugar:</strong> ${o.location}</p>
-            <button class="reclamar-btn"
-              onclick="location.href='carrito.html?id=${o.id}&name=${nameEnc}'">
-              Reclamar
-            </button>
-          </div>`;
-      });
-      renderPagination();
-    }
+      const start = (currentPage-1)*ITEMS_PER_PAGE;
+      const slice = filtered.slice(start, start+ITEMS_PER_PAGE);
 
-    function renderPagination() {
-      const totalPages = Math.ceil(objetos.length / ITEMS_PER_PAGE);
-      pagEl.innerHTML = "";
+      for(const o of slice){
+        const card = document.createElement("article");
+        card.className = "card";
 
-      const makeBtn = (label, page, extraClass="") => {
+        const img = document.createElement("img");
+        img.className = "card-img";
+        img.alt = esc(o.name || "Objeto");
+        img.loading = "lazy";
+        img.src = o.imageUrl || "https://via.placeholder.com/400x250?text=Sin+Imagen";
+        card.appendChild(img);
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const h3 = document.createElement("h3");
+        h3.className = "card-title";
+        h3.textContent = o.name || "Objeto";
+        body.appendChild(h3);
+
+        const p1 = document.createElement("p");
+        p1.className = "card-meta";
+        p1.innerHTML = `<strong>Fecha registro:</strong> ${esc(formatDate(o.createdAt))}`;
+        body.appendChild(p1);
+
+        const p2 = document.createElement("p");
+        p2.className = "card-meta";
+        p2.innerHTML = `<strong>Descripción:</strong> ${esc(o.description)}`;
+        body.appendChild(p2);
+
+        const p3 = document.createElement("p");
+        p3.className = "card-meta";
+        p3.innerHTML = `<strong>Lugar:</strong> ${esc(o.location)}`;
+        body.appendChild(p3);
+
+        card.appendChild(body);
+
         const btn = document.createElement("button");
-        btn.textContent = label;
-        if (page < 1 || page > totalPages) {
-          btn.classList.add("disabled");
-        } else if (page === currentPage) {
-          btn.classList.add("current");
-        } else {
-          btn.addEventListener("click", () => renderPage(page));
-        }
-        if (extraClass) btn.classList.add(extraClass);
-        pagEl.appendChild(btn);
-      };
+        btn.className = "reclamar";
+        btn.type = "button";
+        btn.textContent = "Reclamar";
+        btn.addEventListener("click", ()=>{
+          const nameEnc = encodeURIComponent(o.name || "");
+          location.href = `carrito.html?id=${o.id}&name=${nameEnc}`;
+        });
+        card.appendChild(btn);
 
-      makeBtn("«", currentPage - 1);
-      for (let i = 1; i <= totalPages; i++) {
-        makeBtn(i, i);
+        listEl.appendChild(card);
       }
-      makeBtn("»", currentPage + 1);
     }
 
-    fetchObjetos();
+    function renderPagination(){
+      pagerEl.innerHTML = "";
+      const total = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+      const mk = (label, page, {disabled=false, current=false}={})=>{
+        const b = document.createElement("button");
+        b.textContent = label;
+        if (disabled){ b.classList.add("disabled"); b.disabled = true; }
+        else if (current){ b.classList.add("current"); b.disabled = true; }
+        else { b.addEventListener("click", ()=>{ currentPage = page; render(); }); }
+        pagerEl.appendChild(b);
+      };
+      mk("«", currentPage-1, {disabled: currentPage<=1});
+      for (let i=1;i<=total;i++){
+        mk(String(i), i, {current: i===currentPage});
+      }
+      mk("»", currentPage+1, {disabled: currentPage>=total});
+    }
+
+    /* ---------- Eventos ---------- */
+    btnSearch.addEventListener("click", applyFilter);
+    btnClear.addEventListener("click", ()=>{
+      inputQ.value = "";
+      applyFilter();
+      inputQ.focus();
+    });
+    inputQ.addEventListener("keydown", (e)=>{
+      if (e.key === "Enter"){ e.preventDefault(); applyFilter(); }
+    });
+
+    /* ---------- Init ---------- */
+    fetchObjects();
   </script>
 </body>
 </html>
