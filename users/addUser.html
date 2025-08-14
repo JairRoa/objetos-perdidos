@@ -102,6 +102,15 @@
     }
     .admin-tools button[disabled]{ opacity:.6; cursor:progress; }
 
+    .filters { display:flex; gap:.5rem; margin:.5rem 0 1rem; flex-wrap:wrap; }
+    .filters input[type="search"]{ flex:2; min-width:220px; padding:.5rem; border:1px solid #ccc; border-radius:6px; }
+    .filters select{ flex:1; min-width:180px; padding:.5rem; border:1px solid #ccc; border-radius:6px; }
+
+    /* NUEVO: barra de búsqueda por código */
+    .code-search { display:flex; gap:.5rem; margin:.25rem 0 1rem; flex-wrap:wrap; }
+    .code-search input[type="text"]{ flex:1; min-width:240px; padding:.5rem; border:1px solid #ccc; border-radius:6px; }
+    .code-search button{ padding:.5rem .9rem; border:none; border-radius:6px; font-weight:600; cursor:pointer; background:var(--verde-principal); color:#fff; }
+
     .table-wrapper { overflow-x:auto; margin-bottom:1rem; width:100%; }
     table { width:100%; border-collapse:collapse; }
     th, td { padding:.75rem; border:1px solid #ddd; text-align:left; }
@@ -128,6 +137,7 @@
       .tabs button { flex:1 1 100%; }
       .entity-form { grid-template-columns:1fr; }
       .entity-form button { grid-column:auto; }
+      .filters, .code-search { flex-direction:column; }
       th, td { padding:.5rem; font-size:.85rem; }
       .pagination button { padding:.3rem .5rem; font-size:.8rem; }
     }
@@ -212,6 +222,24 @@
     <!-- OBJETOS -->
     <section id="objects-section">
       <h2>Gestión de Objetos</h2>
+
+      <!-- Filtros existentes (no tocados) -->
+      <div class="filters">
+        <input type="search" id="obj-search" placeholder="Buscar por código, nombre, descripción o lugar..." />
+        <select id="obj-status-filter">
+          <option value="all">Todos</option>
+          <option value="por entregar">Por entregar</option>
+          <option value="entregado">Entregado</option>
+          <option value="de baja">De baja</option>
+        </select>
+      </div>
+
+      <!-- NUEVO: barra y botón de búsqueda por CÓDIGO exacto -->
+      <div class="code-search">
+        <input type="text" id="obj-code-input" placeholder="Código exacto (p. ej. 7F2K9A1B)" />
+        <button id="obj-code-btn" type="button" title="Buscar por código exacto">Buscar</button>
+      </div>
+
       <form id="add-object-form" class="entity-form" enctype="multipart/form-data" autocomplete="off">
         <div>
           <label for="object-name">Nombre del Objeto</label>
@@ -240,7 +268,15 @@
         <table>
           <thead>
             <tr>
-              <th>#</th><th>Nombre</th><th>Fecha</th><th>Descripción</th><th>Lugar</th><th>Imagen</th><th>Estado</th><th>Acciones</th>
+              <th>#</th>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Lugar</th>
+              <th>Imagen</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="objects-table-body"></tbody>
@@ -260,11 +296,10 @@
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
     import {
       getFirestore, collection, getDocs, doc, getDoc,
-      setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp
+      setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp,
+      query, where, limit
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-    import {
-      getFunctions, httpsCallable
-    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-functions.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-functions.js";
 
     // --- Config Firebase ---
     const firebaseConfig = {
@@ -298,6 +333,26 @@
       .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">", "&gt;")
       .replaceAll('"',"&quot;").replaceAll("'","&#39;");
     const enable = (el, yes=true) => { el.disabled = !yes; };
+
+    // ===== Generación de código alfanumérico único =====
+    function generarCodigo(len = 8) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let code = "";
+      for (let i=0;i<len;i++) code += chars.charAt(Math.floor(Math.random()*chars.length));
+      return code;
+    }
+    async function existeCodigo(code) {
+      const qy = query(collection(db,'objects'), where('code','==',code), limit(1));
+      const snap = await getDocs(qy);
+      return !snap.empty;
+    }
+    async function generarCodigoUnico(intentos = 8) {
+      for (let i=0;i<intentos;i++){
+        const c = generarCodigo(8);
+        if(!(await existeCodigo(c))) return c;
+      }
+      return `X${Date.now().toString(36).toUpperCase()}`.slice(0,9);
+    }
 
     // Tabs
     $$('.tabs button').forEach(btn=>{
@@ -337,26 +392,23 @@
         } catch (_) { IS_ADMIN = false; }
       }
 
-      const usersSection = document.getElementById('users');
-      const form = document.getElementById('add-user-form');
       const submitBtn = document.getElementById('submit-user-btn');
       const warning = document.getElementById('users-warning');
       const backfillBtn = document.getElementById('run-backfill');
 
       if (IS_ADMIN) {
-        // Admin: todo visible
         warning.style.display = 'none';
         if (backfillBtn) {
           backfillBtn.style.display = 'inline-block';
           backfillBtn.onclick = async ()=>{
             enable(backfillBtn, false); backfillBtn.textContent = 'Sincronizando...';
             try {
-              const r = await backfillUsersToFirestore(); // requiere callable deploy
+              const r = await backfillUsersToFirestore();
               alert(`Backfill finalizado. Creados: ${r.data?.created ?? 0}`);
               await loadUsers();
             } catch(e) {
               console.error(e);
-              alert('Error ejecutando backfill. Verifica que la Function exista y tu usuario tenga claim admin:true.');
+              alert('Error ejecutando backfill. Verifica la Function y tu claim admin:true.');
             } finally {
               enable(backfillBtn, true); backfillBtn.textContent = 'Sincronizar usuarios';
             }
@@ -364,19 +416,14 @@
         }
         loadUsers();
       } else {
-        // NO admin:
-        // - Ocultar tabla+pag y botón backfill
-        document.querySelector('.table-wrapper').style.display = 'none';
+        // Oculta SOLO la tabla de usuarios (no objetos)
+        document.querySelector('#users .table-wrapper').style.display = 'none';
         document.getElementById('users-pagination').style.display = 'none';
         if (backfillBtn) backfillBtn.style.display = 'none';
-        // - Mensaje
         warning.style.display = 'block';
-        // - Botón
         submitBtn.textContent = 'Actualizar mi perfil';
-        // - Bloquear cambios de rol y correo
         document.getElementById('user-role').disabled = true;
         document.getElementById('user-email').disabled = true;
-        // - Cargar datos propios
         try {
           const meSnap = await getDoc(doc(db, 'users', user.uid));
           const d = meSnap.exists() ? meSnap.data() : {};
@@ -392,6 +439,7 @@
       }
 
       // Objetos (para todos autenticados)
+      setupObjectsUI();
       loadObjects();
     });
 
@@ -446,138 +494,120 @@
       `);
     }
 
-    // Delegación Users (solo admins tienen tabla visible; reforzamos aquí)
-    uBody.addEventListener('click', async (ev)=>{
-      if (!IS_ADMIN) return; // no-admin no debe llegar aquí
-      const btn = ev.target.closest('button'); if (!btn) return;
-      const row = btn.closest('tr'); const id = row?.dataset?.id; if (!id) return;
-
-      if (btn.classList.contains('edit-btn')) {
-        try {
-          const d = (await getDoc(doc(db,'users',id))).data();
-          if (!d) return alert('No se encontró el usuario.');
-          document.getElementById('user-name').value  = d.name || '';
-          document.getElementById('user-role').value  = d.role || 'user';
-          document.getElementById('user-email').value = d.email || '';
-          document.getElementById('user-phone').value = d.phone || '';
-          document.getElementById('user-password').value = '';
-          document.getElementById('confirm-password').value = '';
-          document.getElementById('editing-user-id').value = id;
-          document.getElementById('submit-user-btn').textContent='Actualizar Usuario';
-          // Habilitar campos rol/email para admin
-          document.getElementById('user-role').disabled = false;
-          document.getElementById('user-email').disabled = false;
-        } catch(e) {
-          console.error(e); alert('Error cargando usuario.');
-        }
-      }
-
-      if (btn.classList.contains('delete-btn')) {
-        if(!confirm('¿Eliminar este registro de Firestore? (No borra la cuenta en Authentication)')) return;
-        try {
-          await deleteDoc(doc(db,'users',id));
-          loadUsers();
-        } catch(e) {
-          console.error(e); alert('Error eliminando usuario.');
-        }
-      }
-    });
-
-    // Submit crear/actualizar usuario
-    document.getElementById('add-user-form').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const submitBtn = document.getElementById('submit-user-btn'); enable(submitBtn, false);
-
-      const id    = document.getElementById('editing-user-id').value;
-      const name  = document.getElementById('user-name').value.trim();
-      const role  = document.getElementById('user-role').value;
-      const email = document.getElementById('user-email').value.trim();
-      const phone = document.getElementById('user-phone').value.trim();
-      const pwd   = document.getElementById('user-password').value;
-      const pwd2  = document.getElementById('confirm-password').value;
-
-      if (!name || !email || !phone) {
-        alert('Nombre, correo y teléfono son obligatorios.');
-        return enable(submitBtn, true);
-      }
-
-      // No-admin: solo puede actualizar su propio perfil (sin cambiar rol/correo)
-      if (!IS_ADMIN) {
-        if (!id) { alert('No tienes permisos para crear usuarios.'); return enable(submitBtn, true); }
-        const currentUid = auth.currentUser?.uid;
-        if (id !== currentUid) { alert('Solo puedes editar tu propio perfil.'); return enable(submitBtn, true); }
-      }
-
-      try {
-        if (id) {
-          // Actualizar
-          if (IS_ADMIN) {
-            await updateDoc(doc(db,'users',id), { name, role, email, phone });
-            alert('Usuario actualizado.');
-          } else {
-            await updateDoc(doc(db,'users',id), { name, phone });
-            alert('Perfil actualizado.');
-          }
-        } else {
-          // Crear (solo admin)
-          if (!IS_ADMIN) {
-            alert('No tienes permisos para crear usuarios.');
-          } else {
-            if (!pwd || !pwd2) { alert('Define y confirma la contraseña.'); return enable(submitBtn, true); }
-            if (pwd !== pwd2)  { alert('Las contraseñas no coinciden.');  return enable(submitBtn, true); }
-
-            const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pwd);
-            await setDoc(doc(db,'users',cred.user.uid), {
-              uid: cred.user.uid, name, role, email, phone, createdAt: serverTimestamp()
-            });
-            try { await signOut(secondaryAuth); } catch(_) {}
-            alert('Usuario creado.');
-          }
-        }
-
-        // Reset y recarga si es admin (tiene tabla)
-        e.target.reset();
-        document.getElementById('editing-user-id').value = '';
-        document.getElementById('submit-user-btn').textContent = IS_ADMIN ? 'Agregar Usuario' : 'Actualizar mi perfil';
-        if (IS_ADMIN) loadUsers();
-      } catch (err) {
-        console.error(err);
-        const code = err?.code || '';
-        if (code === 'auth/email-already-in-use') alert('Ese correo ya está registrado.');
-        else if (code === 'auth/invalid-email')   alert('Correo inválido.');
-        else if (code === 'auth/weak-password')   alert('La contraseña es muy débil.');
-        else if (code === 'permission-denied')    alert('Permiso denegado. Revisa reglas/claims.');
-        else alert('Ocurrió un error al guardar el usuario.');
-      } finally {
-        enable(submitBtn, true);
-      }
-    });
-
     // ===================== OBJETOS =====================
-    let objects=[];
+    let objects=[]; let filtered=[];
     const oBody  = document.getElementById('objects-table-body');
     const oPager = document.getElementById('objects-pagination');
+    const searchInput = document.getElementById('obj-search');
+    const statusFilter = document.getElementById('obj-status-filter');
+
+    // NUEVO: elementos de búsqueda por código exacto
+    const codeInput = document.getElementById('obj-code-input');
+    const codeBtn   = document.getElementById('obj-code-btn');
+
+    function setupObjectsUI(){
+      // filtros existentes
+      if (searchInput) searchInput.addEventListener('input', applyObjectFilters);
+      if (statusFilter) statusFilter.addEventListener('change', applyObjectFilters);
+      // fecha por defecto hoy
+      const d=new Date();
+      const today=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const dateInput=document.getElementById('object-date');
+      if(dateInput && !dateInput.value) dateInput.value = today;
+
+      // NUEVO: búsqueda por código exacto al presionar botón
+      if (codeBtn) {
+        codeBtn.addEventListener('click', async ()=>{
+          const raw = (codeInput?.value || '').trim();
+          if (!raw) {
+            // vacío => restablecer lista completa con filtros normales
+            applyObjectFilters();
+            return;
+          }
+          const code = raw.toUpperCase();
+
+          // 1) busca en memoria
+          let match = objects.find(o => (o.code||'').toUpperCase() === code);
+
+          // 2) si no está en memoria, intenta en Firestore (por si hay muchos y no cargó alguno)
+          if (!match) {
+            try {
+              const qy = query(collection(db,'objects'), where('code','==', code), limit(1));
+              const snap = await getDocs(qy);
+              if (!snap.empty) {
+                const d = snap.docs[0];
+                match = { id: d.id, ...d.data() };
+              }
+            } catch (_) {}
+          }
+
+          // Render según resultado
+          if (match) {
+            paginate([match], 1, renderObject, oBody, oPager);
+          } else {
+            // tabla con mensaje de no encontrado
+            oBody.innerHTML = `
+              <tr><td colspan="9" style="text-align:center;color:#666;">
+                No se encontró un objeto con el código <strong>${esc(code)}</strong>.
+              </td></tr>
+            `;
+            oPager.innerHTML = '';
+          }
+        });
+      }
+    }
 
     async function loadObjects(){
       objects=[];
       const snap = await getDocs(collection(db,'objects'));
-      snap.forEach(d=>objects.push({id:d.id, ...d.data()}));
+      for (const d of snap.docs) {
+        const data = d.data();
+        // Asignar código a los que no tengan
+        if (!data.code) {
+          try {
+            const nuevo = await generarCodigoUnico();
+            await updateDoc(doc(db,'objects', d.id), { code: nuevo });
+            data.code = nuevo;
+          } catch (e) {
+            console.warn('No se pudo asignar code a', d.id, e?.message||e);
+          }
+        }
+        objects.push({ id: d.id, ...data });
+      }
+      // Ordena por createdAt desc
       objects.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
-      paginate(objects,1,renderObject,oBody,oPager);
+      applyObjectFilters();
+    }
+
+    function applyObjectFilters(){
+      const q = (searchInput?.value || '').trim().toLowerCase();
+      const st = statusFilter?.value || 'all';
+
+      let base = objects.slice();
+      if (st !== 'all') base = base.filter(o => (o.status || 'por entregar') === st);
+      if (q) {
+        base = base.filter(o => {
+          const haystack = `${o.code||''} ${o.name||''} ${o.description||''} ${o.location||''}`.toLowerCase();
+          return haystack.includes(q);
+        });
+      }
+      filtered = base;
+      paginate(filtered, 1, renderObject, oBody, oPager);
     }
 
     function renderObject(o, idx){
       oBody.insertAdjacentHTML('beforeend', `
         <tr data-id="${esc(o.id)}">
           <td>${idx}</td>
-          <td>${esc(o.name)}</td>
-          <td>${esc(o.date)}</td>
-          <td>${esc(o.description)}</td>
-          <td>${esc(o.location)}</td>
+          <td>${esc(o.code || '')}</td>
+          <td>${esc(o.name || '')}</td>
+          <td>${esc(o.date || '')}</td>
+          <td>${esc(o.description || '')}</td>
+          <td>${esc(o.location || '')}</td>
           <td>${o.imageUrl ? `<img src="${esc(o.imageUrl)}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">` : '—'}</td>
           <td>
             <select class="status-select">
-              <option value="por entregar"${o.status==='por entregar'?' selected':''}>Por entregar</option>
+              <option value="por entregar"${(o.status||'por entregar')==='por entregar'?' selected':''}>Por entregar</option>
               <option value="entregado"${o.status==='entregado'?' selected':''}>Entregado</option>
               <option value="de baja"${o.status==='de baja'?' selected':''}>De baja</option>
             </select>
@@ -599,14 +629,13 @@
         try {
           const status = row.querySelector('.status-select').value;
           await updateDoc(doc(db,'objects',id), { status });
-          if (status !== 'por entregar') row.remove();
           alert('Estado actualizado.');
         } catch(e) { console.error(e); alert('Error actualizando estado.'); }
       }
 
       if (btn.classList.contains('delete-btn')) {
         if(!confirm('¿Eliminar este objeto?')) return;
-        try { await deleteDoc(doc(db,'objects',id)); loadObjects(); }
+        try { await deleteDoc(doc(db,'objects',id)); await loadObjects(); }
         catch(e) { console.error(e); alert('Error eliminando objeto.'); }
       }
     });
@@ -639,14 +668,17 @@
           imageUrl  = js.secure_url || '';
         }
 
+        const code = await generarCodigoUnico();
+
         await addDoc(collection(db,'objects'),{
+          code,
           name, date, description: desc, location: loc,
           imageUrl, status: 'por entregar', createdAt: serverTimestamp()
         });
 
-        alert('Objeto agregado.');
+        alert(`Objeto agregado. Código: ${code}`);
         f.reset();
-        loadObjects();
+        await loadObjects();
       } catch (err) {
         console.error(err);
         alert('Error agregando el objeto.');

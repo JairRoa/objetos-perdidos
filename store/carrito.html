@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#2e9d57" />
-
-    <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
+  <meta name="theme-color" content="#2e9d57" />
+  <link rel="icon" href="/img/favicon.png" type="image/x-icon" />
   <title>Formulario – Objetos Perdidos</title>
 
   <!-- Estilos -->
@@ -44,9 +43,7 @@
       margin: 0;
       color: #2b4f97;
     }
-    h1, h2, h3, p, label {
-      color: #2b4f97;
-    }
+    h1, h2, h3, p, label { color: #2b4f97; }
 
     /* HEADER */
     header {
@@ -55,84 +52,41 @@
       text-align: center;
       position: relative;
     }
-    header h1 {
-      margin-bottom: 0.5rem;
-      color: #fff;
-    }
+    header h1 { margin-bottom: 0.5rem; color: #fff; }
     header nav {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      gap: 1.5rem;
-      align-items: center;
+      display: flex; flex-direction: row; justify-content: center;
+      gap: 1.5rem; align-items: center;
     }
     header nav a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.2s;
+      color: #fff; text-decoration: none; font-weight: bold; transition: color 0.2s;
     }
-    header nav a:hover {
-      color: #f9d94e;
-    }
+    header nav a:hover { color: #f9d94e; }
 
     /* MAIN */
-    main {
-      padding: 2rem;
-      max-width: 600px;
-      margin: 0 auto;
+    main { padding: 2rem; max-width: 600px; margin: 0 auto; }
+    #producto-seleccionado, form {
+      background: #fff; padding: 1rem; border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;
     }
-    #producto-seleccionado,
-    form {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-    }
-    form {
-      display: grid;
-      gap: 1rem;
-    }
+    form { display: grid; gap: 1rem; }
     input, select {
-      width: 100%;
-      padding: .5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: 4px;
     }
     button {
-      padding: .75rem;
-      background: #2e9d57;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      color: #fff;
-      transition: background 0.2s;
+      padding: .75rem; background: #2e9d57; border: none; border-radius: 5px;
+      font-weight: bold; cursor: pointer; color: #fff; transition: background 0.2s;
     }
-    button:hover {
-      background: #f9d94e;
-      color: #1a1a1a;
-    }
+    button[disabled]{ opacity:.6; cursor:progress; }
+    button:hover { background: #f9d94e; color: #1a1a1a; }
+
     #codigo {
-      display: none;
-      margin-top: 1rem;
-      padding: 1rem;
-      background: #e8ffe8;
-      border: 1px solid #2e9d57;
-      border-radius: 5px;
-      text-align: center;
-      font-weight: bold;
-      color: #2b4f97;
+      display: none; margin-top: 1rem; padding: 1rem;
+      background: #e8ffe8; border: 1px solid #2e9d57; border-radius: 5px;
+      text-align: center; font-weight: bold; color: #2b4f97;
     }
 
     /* FOOTER */
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background: #2e9d57;
-      color: #fff;
-    }
+    footer { text-align: center; padding: 1rem; background: #2e9d57; color: #fff; }
   </style>
 </head>
 <body>
@@ -153,7 +107,7 @@
     <div id="producto-seleccionado"><p>Cargando...</p></div>
 
     <h2>Datos del Usuario</h2>
-    <form id="client-form">
+    <form id="client-form" autocomplete="off">
       <label for="selected-name">Objeto seleccionado</label>
       <input type="text" id="selected-name" readonly />
 
@@ -184,15 +138,15 @@
       <div>
         <input type="checkbox" id="accept-data" required />
         <label for="accept-data">
-          Acepto el 
-          <a href="https://universidadean.edu.co/sites/default/files/institucion/acuerdos/politica-tratamiento-de-datos-personales.pdf" 
+          Acepto el
+          <a href="https://universidadean.edu.co/sites/default/files/institucion/acuerdos/politica-tratamiento-de-datos-personales.pdf"
              target="_blank" rel="noopener">
             tratamiento de datos
           </a>
         </label>
       </div>
 
-      <button type="submit">Enviar</button>
+      <button type="submit" id="send-btn">Enviar</button>
     </form>
 
     <div id="codigo"></div>
@@ -201,13 +155,40 @@
   <footer>&copy; 2025 Infraestructura y Planta Física.</footer>
 
   <script type="module">
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import {
+      doc, getDoc, updateDoc, collection, getDocs, query, where, limit
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
     const db = window.db;
     const params = new URLSearchParams(location.search);
     const objId  = params.get("id");
     const nameQ  = params.get("name");
     const cont   = document.getElementById("producto-seleccionado");
     const selIn  = document.getElementById("selected-name");
+    const sendBtn= document.getElementById("send-btn");
+
+    // Helpers para generar código único (mismo esquema del admin)
+    function generarCodigo(len = 8) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let code = "";
+      for (let i=0;i<len;i++) code += chars.charAt(Math.floor(Math.random()*chars.length));
+      return code;
+    }
+    async function existeCodigo(code) {
+      const qy = query(collection(db,'objects'), where('code','==',code), limit(1));
+      const snap = await getDocs(qy);
+      return !snap.empty;
+    }
+    async function generarCodigoUnico(intentos = 8) {
+      for (let i=0;i<intentos;i++){
+        const c = generarCodigo(8);
+        if(!(await existeCodigo(c))) return c;
+      }
+      return `X${Date.now().toString(36).toUpperCase()}`.slice(0,9);
+    }
+
+    // Objeto actual en memoria
+    let currentObject = null;
 
     async function cargarObjeto() {
       if (!objId) {
@@ -217,63 +198,94 @@
       cont.innerHTML = "<p>Cargando...</p>";
       try {
         const snap = await getDoc(doc(db, "objects", objId));
-        if (!snap.exists()) throw "";
+        if (!snap.exists()) throw new Error("not-found");
         const o = snap.data();
-        selIn.value = nameQ || o.name;
+
+        // Generar y guardar code si falta
+        if (!o.code) {
+          try {
+            const nuevo = await generarCodigoUnico();
+            await updateDoc(doc(db,"objects",objId), { code: nuevo });
+            o.code = nuevo;
+          } catch (e) {
+            console.warn("No se pudo asignar code al objeto:", e?.message || e);
+          }
+        }
+
+        currentObject = { id: objId, ...o };
+
+        selIn.value = nameQ || o.name || "";
         cont.innerHTML = `
           <img src="${o.imageUrl||'https://via.placeholder.com/400'}"
-               style="width:100%;border-radius:5px;margin-bottom:1rem">
-          <h3>${o.name}</h3>
-          <p><strong>Descripción:</strong> ${o.description}</p>
-          <p><strong>Lugar:</strong> ${o.location}</p>`;
-      } catch {
+               alt="Objeto" style="width:100%;border-radius:5px;margin-bottom:1rem">
+          <h3>${o.name || ''}</h3>
+          <p><strong>Código:</strong> ${o.code || '—'}</p>
+          <p><strong>Descripción:</strong> ${o.description || ''}</p>
+          <p><strong>Lugar:</strong> ${o.location || ''}</p>
+        `;
+      } catch (err) {
+        console.error(err);
         cont.innerHTML = "<p>Error al cargar el objeto.</p>";
       }
     }
     cargarObjeto();
 
-    function generarCodigo() {
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      return Array.from({ length: 6 })
-                  .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
-                  .join("");
-    }
+    document.getElementById("client-form").addEventListener("submit", async e => {
+      e.preventDefault();
 
-    document.getElementById("client-form")
-      .addEventListener("submit", async e => {
-        e.preventDefault();
+      if (!document.getElementById("accept-data").checked) {
+        return alert("Debe aceptar el tratamiento de datos para continuar.");
+      }
 
+      const n  = document.getElementById("cliente-nombre").value.trim();
+      const dt = document.getElementById("cliente-doc").value;
+      const id = document.getElementById("cliente-id").value.trim();
+      const f  = document.getElementById("cliente-facultad").value.trim();
+      const t  = document.getElementById("cliente-telefono").value.trim();
+      const c  = document.getElementById("cliente-correo").value.trim();
+      const obj = selIn.value;
 
-        // checkbox debe estar marcado
-        if (!document.getElementById("accept-data").checked) {
-          return alert("Debe aceptar el tratamiento de datos para continuar.");
-        }
-        const n  = document.getElementById("cliente-nombre").value.trim();
-        const dt = document.getElementById("cliente-doc").value;
-        const id = document.getElementById("cliente-id").value.trim();
-        const f  = document.getElementById("cliente-facultad").value.trim();
-        const t  = document.getElementById("cliente-telefono").value.trim();
-        const c  = document.getElementById("cliente-correo").value.trim();
-        const obj = selIn.value;
-        const code = generarCodigo();
-        const templateParams = {
-          email: c,
-          reply_to: "logisyaudio@universidadean.edu.co",
-          name: n,
-          title: obj,
-          message: `Código: ${code}\nObjeto: ${obj}\n\n-- Datos --\nNombre: ${n}\nDocumento: ${dt} (${id})\nFacultad: ${f}\nTeléfono: ${t}\nCorreo: ${c}`
-        };
-        try {
-          await emailjs.send("service_aedsi78","template_9xehgwe",templateParams);
-          const divCode = document.getElementById("codigo");
-          divCode.textContent = `Tu número de radicado es: ${code}`;
-          divCode.style.display = "block";
-          alert("Correo enviado correctamente.");
-        } catch (err) {
-          console.error("EmailJS error:", err);
-          alert(`Error ${err.status||""}: ${err.text||"no se pudo enviar."}`);
-        }
-      });
+      const code = (currentObject && currentObject.code)
+        ? String(currentObject.code).toUpperCase()
+        : "";
+
+      const params = {
+        email: c,                                   // {{email}} (To Email)
+        reply_to: "logisyaudio@universidadean.edu.co",
+        name: n,                                    // {{name}}
+        title: obj,                                 // {{title}}
+        code,                                       // 🔴 {{code}} para el template
+        cc_email: "logisyaudio@universidadean.edu.co", // CC dinámico
+        message:
+`Código del objeto: ${code}
+Objeto: ${obj}
+
+-- Datos del solicitante --
+Nombre: ${n}
+Documento: ${dt} (${id})
+Facultad/Dependencia: ${f}
+Teléfono: ${t}
+Correo: ${c}`
+      };
+
+      try {
+        sendBtn.disabled = true;
+        await emailjs.send("service_aedsi78","template_9xehgwe", params);
+
+        const divCode = document.getElementById("codigo");
+        divCode.textContent = code
+          ? `Código del objeto: ${code}`
+          : `Solicitud enviada. (Sin código disponible)`;
+        divCode.style.display = "block";
+
+        alert("Correo enviado correctamente.");
+      } catch (err) {
+        console.error("EmailJS error:", err);
+        alert(`Error ${err?.status||""}: ${err?.text||"no se pudo enviar."}`);
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
   </script>
 
 </body>
