@@ -106,7 +106,6 @@
     .filters input[type="search"]{ flex:2; min-width:220px; padding:.5rem; border:1px solid #ccc; border-radius:6px; }
     .filters select{ flex:1; min-width:180px; padding:.5rem; border:1px solid #ccc; border-radius:6px; }
 
-    /* NUEVO: barra de búsqueda por código */
     .code-search { display:flex; gap:.5rem; margin:.25rem 0 1rem; flex-wrap:wrap; }
     .code-search input[type="text"]{ flex:1; min-width:240px; padding:.5rem; border:1px solid #ccc; border-radius:6px; }
     .code-search button{ padding:.5rem .9rem; border:none; border-radius:6px; font-weight:600; cursor:pointer; background:var(--verde-principal); color:#fff; }
@@ -163,12 +162,10 @@
     <section id="users" class="active">
       <h2>Gestión de Usuarios</h2>
 
-      <!-- Aviso para no-admin -->
       <p id="users-warning" style="display:none; background:#fff3cd; color:#8a6d3b; border:1px solid #faebcc; padding:.6rem; border-radius:6px; margin:.5rem 0 1rem;">
         No tienes permisos para ver la lista de usuarios. Solo puedes editar tu propio perfil.
       </p>
 
-      <!-- Herramientas admin -->
       <div class="admin-tools">
         <button id="run-backfill" title="Sincroniza usuarios de Authentication a Firestore" style="display:none;">Sincronizar usuarios</button>
       </div>
@@ -223,7 +220,6 @@
     <section id="objects-section">
       <h2>Gestión de Objetos</h2>
 
-      <!-- Filtros existentes (no tocados) -->
       <div class="filters">
         <input type="search" id="obj-search" placeholder="Buscar por código, nombre, descripción o lugar..." />
         <select id="obj-status-filter">
@@ -234,11 +230,14 @@
         </select>
       </div>
 
-      <!-- NUEVO: barra y botón de búsqueda por CÓDIGO exacto -->
       <div class="code-search">
         <input type="text" id="obj-code-input" placeholder="Código exacto (p. ej. 7F2K9A1B)" />
         <button id="obj-code-btn" type="button" title="Buscar por código exacto">Buscar</button>
       </div>
+
+      <p id="objects-warning" style="display:none;background:#fff3cd;color:#8a6d3b;border:1px solid #faebcc;padding:.6rem;border-radius:6px;margin:.5rem 0 1rem;">
+        No tienes permisos para <strong>eliminar</strong> objetos. Puedes <strong>crear</strong> nuevos y <strong>cambiar el estado</strong> de los existentes.
+      </p>
 
       <form id="add-object-form" class="entity-form" enctype="multipart/form-data" autocomplete="off">
         <div>
@@ -301,7 +300,6 @@
     } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
     import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-functions.js";
 
-    // --- Config Firebase ---
     const firebaseConfig = {
       apiKey: "AIzaSyBrh5AP2ErXaQAcZb0NMHq_5cBrvNZIlWo",
       authDomain: "objetosperdidos-76abd.firebaseapp.com",
@@ -312,21 +310,18 @@
       measurementId: "G-95C30B5EK1"
     };
 
-    // App principal (sesión admin/usuario)
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     setPersistence(auth, browserLocalPersistence);
     const db   = getFirestore(app);
 
-    // App secundario para crear usuarios sin cambiar sesión
+    // (Opcional) App secundaria si la usas para crear usuarios
     const secondaryApp  = initializeApp(firebaseConfig, 'secondary');
     const secondaryAuth = getAuth(secondaryApp);
 
-    // Functions
     const functions = getFunctions(getApp());
     const backfillUsersToFirestore = httpsCallable(functions, 'backfillUsersToFirestore');
 
-    // --- Utils ---
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
     const esc = (s = "") => String(s)
@@ -334,7 +329,6 @@
       .replaceAll('"',"&quot;").replaceAll("'","&#39;");
     const enable = (el, yes=true) => { el.disabled = !yes; };
 
-    // ===== Generación de código alfanumérico único =====
     function generarCodigo(len = 8) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let code = "";
@@ -354,7 +348,6 @@
       return `X${Date.now().toString(36).toUpperCase()}`.slice(0,9);
     }
 
-    // Tabs
     $$('.tabs button').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         $$('.tabs button').forEach(x=>x.classList.remove('active'));
@@ -364,26 +357,21 @@
       });
     });
 
-    // Logout
     $('#logout-btn').addEventListener('click', async ()=>{
       await signOut(auth).catch(()=>{});
       window.location.href = '/store/admin.html';
     });
 
-    // --- Estado global de rol ---
     let IS_ADMIN = false;
 
-    // Estado auth
     onAuthStateChanged(auth, async user => {
       if (!user) return window.location.href = '/store/admin.html';
 
-      // 1) Intentar leer claim admin
       try {
         const token = await user.getIdTokenResult();
         IS_ADMIN = !!token.claims?.admin;
       } catch (_) { IS_ADMIN = false; }
 
-      // 2) Si no tiene claim, revisar Firestore /users/{uid}.role
       if (!IS_ADMIN) {
         try {
           const meSnap = await getDoc(doc(db, 'users', user.uid));
@@ -416,7 +404,6 @@
         }
         loadUsers();
       } else {
-        // Oculta SOLO la tabla de usuarios (no objetos)
         document.querySelector('#users .table-wrapper').style.display = 'none';
         document.getElementById('users-pagination').style.display = 'none';
         if (backfillBtn) backfillBtn.style.display = 'none';
@@ -438,12 +425,14 @@
         }
       }
 
-      // Objetos (para todos autenticados)
+      // Mostrar aviso de permisos en Objetos si NO es admin
+      const objWarn = document.getElementById('objects-warning');
+      if (!IS_ADMIN && objWarn) objWarn.style.display = 'block';
+
       setupObjectsUI();
       loadObjects();
     });
 
-    // --- Paginación ---
     const ITEMS_PER_PAGE = 50;
     function paginate(items, page, renderFn, container, pager){
       const total = Math.max(1, Math.ceil(items.length/ITEMS_PER_PAGE));
@@ -465,7 +454,6 @@
       mk('»',page+1);
     }
 
-    // ===================== USUARIOS =====================
     let users=[];
     const uBody  = document.getElementById('users-table-body');
     const uPager = document.getElementById('users-pagination');
@@ -494,42 +482,31 @@
       `);
     }
 
-    // ===================== OBJETOS =====================
     let objects=[]; let filtered=[];
     const oBody  = document.getElementById('objects-table-body');
     const oPager = document.getElementById('objects-pagination');
-    const searchInput = document.getElementById('obj-search');
+    const searchInput  = document.getElementById('obj-search');
     const statusFilter = document.getElementById('obj-status-filter');
 
-    // NUEVO: elementos de búsqueda por código exacto
     const codeInput = document.getElementById('obj-code-input');
     const codeBtn   = document.getElementById('obj-code-btn');
 
     function setupObjectsUI(){
-      // filtros existentes
       if (searchInput) searchInput.addEventListener('input', applyObjectFilters);
       if (statusFilter) statusFilter.addEventListener('change', applyObjectFilters);
-      // fecha por defecto hoy
+
       const d=new Date();
       const today=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const dateInput=document.getElementById('object-date');
       if(dateInput && !dateInput.value) dateInput.value = today;
 
-      // NUEVO: búsqueda por código exacto al presionar botón
       if (codeBtn) {
         codeBtn.addEventListener('click', async ()=>{
           const raw = (codeInput?.value || '').trim();
-          if (!raw) {
-            // vacío => restablecer lista completa con filtros normales
-            applyObjectFilters();
-            return;
-          }
+          if (!raw) { applyObjectFilters(); return; }
           const code = raw.toUpperCase();
 
-          // 1) busca en memoria
           let match = objects.find(o => (o.code||'').toUpperCase() === code);
-
-          // 2) si no está en memoria, intenta en Firestore (por si hay muchos y no cargó alguno)
           if (!match) {
             try {
               const qy = query(collection(db,'objects'), where('code','==', code), limit(1));
@@ -541,16 +518,13 @@
             } catch (_) {}
           }
 
-          // Render según resultado
           if (match) {
             paginate([match], 1, renderObject, oBody, oPager);
           } else {
-            // tabla con mensaje de no encontrado
             oBody.innerHTML = `
               <tr><td colspan="9" style="text-align:center;color:#666;">
                 No se encontró un objeto con el código <strong>${esc(code)}</strong>.
-              </td></tr>
-            `;
+              </td></tr>`;
             oPager.innerHTML = '';
           }
         });
@@ -562,8 +536,8 @@
       const snap = await getDocs(collection(db,'objects'));
       for (const d of snap.docs) {
         const data = d.data();
-        // Asignar código a los que no tengan
-        if (!data.code) {
+        // Solo los admin pueden "sanear" y asignar code faltante
+        if (!data.code && IS_ADMIN) {
           try {
             const nuevo = await generarCodigoUnico();
             await updateDoc(doc(db,'objects', d.id), { code: nuevo });
@@ -574,7 +548,6 @@
         }
         objects.push({ id: d.id, ...data });
       }
-      // Ordena por createdAt desc
       objects.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
       applyObjectFilters();
     }
@@ -614,13 +587,13 @@
           </td>
           <td>
             <button class="save-btn">Guardar</button>
-            <button class="delete-btn">Eliminar</button>
+            ${IS_ADMIN ? '<button class="delete-btn">Eliminar</button>' : ''}
           </td>
         </tr>
       `);
     }
 
-    // Delegación Objetos
+    // Guardar estado (todos los roles)
     oBody.addEventListener('click', async (ev)=>{
       const btn = ev.target.closest('button'); if (!btn) return;
       const row = btn.closest('tr'); const id = row?.dataset?.id; if (!id) return;
@@ -640,7 +613,7 @@
       }
     });
 
-    // Submit objetos
+    // Crear objeto (users y admin): incluye createdBy/createdAt
     document.getElementById('add-object-form').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const submitBtn = document.getElementById('submit-object-btn'); enable(submitBtn, false);
@@ -672,8 +645,14 @@
 
         await addDoc(collection(db,'objects'),{
           code,
-          name, date, description: desc, location: loc,
-          imageUrl, status: 'por entregar', createdAt: serverTimestamp()
+          name,
+          date,
+          description: desc,
+          location: loc,
+          imageUrl,
+          status: 'por entregar',
+          createdAt: serverTimestamp(),
+          createdBy: auth.currentUser.uid
         });
 
         alert(`Objeto agregado. Código: ${code}`);

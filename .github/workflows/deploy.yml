@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting
+name: Deploy to Firebase (Hosting + Firestore Rules)
 
 on:
   push:
@@ -8,14 +8,39 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build --if-present
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+
+      # Si no tienes package-lock.json o no hay scripts, no falla
+      - name: Install deps
+        run: npm ci || true
+
+      - name: Build (if present)
+        run: npm run build --if-present
+
+      # Autenticación con la misma service account ya usada para Hosting
+      - name: Auth with Service Account
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OBJETOSPERDIDOS_76ABD }}
+
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools
+
+      # ⬇️ Nuevo: desplegar reglas de Firestore desde firestore.rules
+      - name: Deploy Firestore Rules
+        run: firebase deploy --only firestore:rules --project objetosperdidos-76abd
+
+      # Hosting (igual que antes)
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OBJETOSPERDIDOS_76ABD }}

@@ -10,10 +10,9 @@
 
   <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
-  <!-- Firebase v11 -->
+  <!-- Firebase v11 (solo lectura del objeto) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { getFirestore }  from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
@@ -30,63 +29,28 @@
     window.db = getFirestore();
   </script>
 
-  <!-- EmailJS v3 -->
+  <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>emailjs.init("3UgVwiV5ojoNsFWdJ");</script>
 
   <style>
-    /* RESET Y GLOBAL */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      color: #2b4f97;
-    }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #2b4f97; }
     h1, h2, h3, p, label { color: #2b4f97; }
-
-    /* HEADER */
-    header {
-      background: #2e9d57;
-      padding: 1rem;
-      text-align: center;
-      position: relative;
-    }
-    header h1 { margin-bottom: 0.5rem; color: #fff; }
-    header nav {
-      display: flex; flex-direction: row; justify-content: center;
-      gap: 1.5rem; align-items: center;
-    }
-    header nav a {
-      color: #fff; text-decoration: none; font-weight: bold; transition: color 0.2s;
-    }
-    header nav a:hover { color: #f9d94e; }
-
-    /* MAIN */
-    main { padding: 2rem; max-width: 600px; margin: 0 auto; }
-    #producto-seleccionado, form {
-      background: #fff; padding: 1rem; border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;
-    }
-    form { display: grid; gap: 1rem; }
-    input, select {
-      width: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: 4px;
-    }
-    button {
-      padding: .75rem; background: #2e9d57; border: none; border-radius: 5px;
-      font-weight: bold; cursor: pointer; color: #fff; transition: background 0.2s;
-    }
+    header { background: #2e9d57; padding: 1rem; text-align: center; }
+    header h1 { margin-bottom: .5rem; color: #fff; }
+    header nav { display:flex; justify-content:center; gap:1.5rem; align-items:center; }
+    header nav a { color:#fff; text-decoration:none; font-weight:bold; transition:color .2s; }
+    header nav a:hover { color:#f9d94e; }
+    main { padding:2rem; max-width:600px; margin:0 auto; }
+    #producto-seleccionado, form { background:#fff; padding:1rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.1); margin-bottom:2rem; }
+    form { display:grid; gap:1rem; }
+    input, select { width:100%; padding:.5rem; border:1px solid #ccc; border-radius:4px; }
+    button { padding:.75rem; background:#2e9d57; border:none; border-radius:5px; font-weight:bold; cursor:pointer; color:#fff; transition:background .2s; }
     button[disabled]{ opacity:.6; cursor:progress; }
-    button:hover { background: #f9d94e; color: #1a1a1a; }
-
-    #codigo {
-      display: none; margin-top: 1rem; padding: 1rem;
-      background: #e8ffe8; border: 1px solid #2e9d57; border-radius: 5px;
-      text-align: center; font-weight: bold; color: #2b4f97;
-    }
-
-    /* FOOTER */
-    footer { text-align: center; padding: 1rem; background: #2e9d57; color: #fff; }
+    button:hover { background:#f9d94e; color:#1a1a1a; }
+    #codigo { display:none; margin-top:1rem; padding:1rem; background:#e8ffe8; border:1px solid #2e9d57; border-radius:5px; text-align:center; font-weight:bold; color:#2b4f97; }
+    footer { text-align:center; padding:1rem; background:#2e9d57; color:#fff; }
   </style>
 </head>
 <body>
@@ -96,9 +60,7 @@
     <nav>
       <a href="../index.html">Inicio</a>
       <a href="productos.html">Objetos</a>
-      <a href="store/admin.html" title="Iniciar Sesión">
-        <i class="fa-solid fa-right-to-bracket fa-lg"></i>
-      </a>
+      <a href="store/admin.html" title="Iniciar Sesión"><i class="fa-solid fa-right-to-bracket fa-lg"></i></a>
     </nav>
   </header>
 
@@ -107,7 +69,7 @@
     <div id="producto-seleccionado"><p>Cargando...</p></div>
 
     <h2>Datos del Usuario</h2>
-    <form id="client-form" autocomplete="off">
+    <form id="client-form" autocomplete="off" novalidate>
       <label for="selected-name">Objeto seleccionado</label>
       <input type="text" id="selected-name" readonly />
 
@@ -132,15 +94,20 @@
       <input type="tel" id="cliente-telefono" required />
 
       <label for="cliente-correo">Correo institucional</label>
-      <input type="email" id="cliente-correo" required />
+      <input
+        type="email"
+        id="cliente-correo"
+        required
+        inputmode="email"
+        pattern="^[a-zA-Z0-9._%+-]+@universidadean\.edu\.co$"
+        title="Debes usar tu correo institucional que termine en @universidadean.edu.co"
+      />
 
-      <!-- Checkbox obligatorio para tratamiento de datos -->
       <div>
         <input type="checkbox" id="accept-data" required />
         <label for="accept-data">
           Acepto el
-          <a href="https://universidadean.edu.co/sites/default/files/institucion/acuerdos/politica-tratamiento-de-datos-personales.pdf"
-             target="_blank" rel="noopener">
+          <a href="https://universidadean.edu.co/sites/default/files/institucion/acuerdos/politica-tratamiento-de-datos-personales.pdf" target="_blank" rel="noopener">
             tratamiento de datos
           </a>
         </label>
@@ -155,19 +122,19 @@
   <footer>&copy; 2025 Infraestructura y Planta Física.</footer>
 
   <script type="module">
-    import {
-      doc, getDoc, updateDoc, collection, getDocs, query, where, limit
-    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { doc, getDoc, updateDoc, collection, getDocs, query, where, limit }
+      from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     const db = window.db;
-    const params = new URLSearchParams(location.search);
-    const objId  = params.get("id");
-    const nameQ  = params.get("name");
+    const paramsURL = new URLSearchParams(location.search);
+    const objId  = paramsURL.get("id");
+    const nameQ  = paramsURL.get("name");
     const cont   = document.getElementById("producto-seleccionado");
     const selIn  = document.getElementById("selected-name");
     const sendBtn= document.getElementById("send-btn");
+    const emailInput = document.getElementById("cliente-correo");
 
-    // Helpers para generar código único (mismo esquema del admin)
+    // --- Código único si el objeto no lo tiene ---
     function generarCodigo(len = 8) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let code = "";
@@ -187,37 +154,28 @@
       return `X${Date.now().toString(36).toUpperCase()}`.slice(0,9);
     }
 
-    // Objeto actual en memoria
+    // --- Cargar objeto ---
     let currentObject = null;
-
     async function cargarObjeto() {
-      if (!objId) {
-        cont.innerHTML = "<p>No hay objeto.</p>";
-        return;
-      }
+      if (!objId) { cont.innerHTML = "<p>No hay objeto.</p>"; return; }
       cont.innerHTML = "<p>Cargando...</p>";
       try {
         const snap = await getDoc(doc(db, "objects", objId));
         if (!snap.exists()) throw new Error("not-found");
         const o = snap.data();
 
-        // Generar y guardar code si falta
         if (!o.code) {
           try {
             const nuevo = await generarCodigoUnico();
             await updateDoc(doc(db,"objects",objId), { code: nuevo });
             o.code = nuevo;
-          } catch (e) {
-            console.warn("No se pudo asignar code al objeto:", e?.message || e);
-          }
+          } catch (e) { console.warn("No se pudo asignar code al objeto:", e?.message || e); }
         }
 
         currentObject = { id: objId, ...o };
-
         selIn.value = nameQ || o.name || "";
         cont.innerHTML = `
-          <img src="${o.imageUrl||'https://via.placeholder.com/400'}"
-               alt="Objeto" style="width:100%;border-radius:5px;margin-bottom:1rem">
+          <img src="${o.imageUrl||'https://via.placeholder.com/400'}" alt="Objeto" style="width:100%;border-radius:5px;margin-bottom:1rem">
           <h3>${o.name || ''}</h3>
           <p><strong>Código:</strong> ${o.code || '—'}</p>
           <p><strong>Descripción:</strong> ${o.description || ''}</p>
@@ -230,7 +188,11 @@
     }
     cargarObjeto();
 
-    document.getElementById("client-form").addEventListener("submit", async e => {
+    // UX: limpiar validación al escribir
+    emailInput.addEventListener("input", () => emailInput.setCustomValidity(""));
+
+    // --- Envío ---
+    document.getElementById("client-form").addEventListener("submit", async (e) => {
       e.preventDefault();
 
       if (!document.getElementById("accept-data").checked) {
@@ -242,20 +204,32 @@
       const id = document.getElementById("cliente-id").value.trim();
       const f  = document.getElementById("cliente-facultad").value.trim();
       const t  = document.getElementById("cliente-telefono").value.trim();
-      const c  = document.getElementById("cliente-correo").value.trim();
+      const c  = emailInput.value.trim();
       const obj = selIn.value;
+
+      // Validación estricta de correo institucional
+      const eduRegex = /^[a-zA-Z0-9._%+-]+@universidadean\.edu\.co$/i;
+      if (!eduRegex.test(c)) {
+        emailInput.setCustomValidity("Debes usar tu correo institucional que termine en @universidadean.edu.co");
+        emailInput.reportValidity();
+        return;
+      }
 
       const code = (currentObject && currentObject.code)
         ? String(currentObject.code).toUpperCase()
         : "";
 
-      const params = {
-        email: c,                                   // {{email}} (To Email)
-        reply_to: "logisyaudio@universidadean.edu.co",
-        name: n,                                    // {{name}}
-        title: obj,                                 // {{title}}
-        code,                                       // 🔴 {{code}} para el template
-        cc_email: "logisyaudio@universidadean.edu.co", // CC dinámico
+      // Parámetros de la plantilla (plantilla usa: {{email}}, {{cc_email}}, {{reply_to}}, {{from_name}})
+      const templateParams = {
+        email: "colviseg@universidadean.edu.co",                   // To (fijo)
+        cc_email: `logisyaudio@universidadean.edu.co, ${c}`,       // CC: logística + usuario
+        reply_to: c,                                               // para que "Responder" vaya al usuario
+        from_name: n,                                              // remitente visible
+
+        // Campos usados en el cuerpo
+        name: n,
+        title: obj,
+        code,
         message:
 `Código del objeto: ${code}
 Objeto: ${obj}
@@ -270,18 +244,16 @@ Correo: ${c}`
 
       try {
         sendBtn.disabled = true;
-        await emailjs.send("service_aedsi78","template_9xehgwe", params);
+        // Servicio corporativo de Outlook conectado en EmailJS
+        await emailjs.send("service_aedsi78", "template_9xehgwe", templateParams);
 
         const divCode = document.getElementById("codigo");
-        divCode.textContent = code
-          ? `Código del objeto: ${code}`
-          : `Solicitud enviada. (Sin código disponible)`;
+        divCode.textContent = code ? `Código del objeto: ${code}` : `Solicitud enviada. (Sin código disponible)`;
         divCode.style.display = "block";
-
         alert("Correo enviado correctamente.");
       } catch (err) {
         console.error("EmailJS error:", err);
-        alert(`Error ${err?.status||""}: ${err?.text||"no se pudo enviar."}`);
+        alert(`Error ${err?.status || ""}: ${err?.text || "no se pudo enviar."}`);
       } finally {
         sendBtn.disabled = false;
       }

@@ -1,52 +1,56 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isSignedIn() { return request.auth != null; }
 
-    // Admin por custom claim o por rol en Firestore (compat)
     function isAdmin() {
-      return isSignedIn() && (
-        request.auth.token.admin == true ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
-      );
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // ---------- USERS ----------
-    match /users/{uid} {
-      // Leer:
-      // - Admin puede leer a todos
-      // - Usuario solo su propio documento
-      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
+    /* USERS */
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null &&
+                    (request.auth.uid == request.resource.data.uid || isAdmin());
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        (request.auth.uid == userId &&
+          (!('role' in request.resource.data) ||
+           request.resource.data.role == resource.data.role))
+      );
+      allow delete: if isAdmin();
+    }
 
-      // Crear / Borrar: solo admin
-      allow create, delete: if isAdmin();
+    /* OBJECTS */
+    match /objects/{objectId} {
+      // lectura pública
+      allow read: if true;
 
-      // Actualizar:
-      // - Admin puede actualizar cualquiera
-      // - Usuario solo su doc y NO puede cambiar su 'role'
-      allow update: if
+      // crear: cualquier autenticado, con campos y valores controlados
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly([
+          'code', 'name', 'date', 'description', 'location',
+          'imageUrl', 'status', 'createdAt', 'createdBy'
+        ])
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status == 'por entregar'
+        && (request.resource.data.createdAt is timestamp);
+
+      // actualizar:
+      //  - admin: cualquier campo
+      //  - user: SOLO puede cambiar 'status'
+      allow update: if request.auth != null && (
         isAdmin() ||
         (
-          isSignedIn() &&
-          request.auth.uid == uid &&
-          (
-            // si envía 'role', debe quedar igual al actual
-            !( 'role' in request.resource.data ) ||
-            request.resource.data.role == resource.data.role
-          )
-        );
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['status']) &&
+          request.resource.data.status in ['por entregar','entregado','de baja']
+        )
+      );
+
+      // eliminar: solo admin
+      allow delete: if isAdmin();
     }
 
-    // ---------- OBJECTS ----------
-    match /objects/{id} {
-      // Lectura: autenticados
-      allow read: if isSignedIn();
-
-      // Crear/Actualizar/Borrar: solo admin
-      allow create, update, delete: if isAdmin();
-    }
-
-    // Bloquea todo lo demás
     match /{document=**} {
       allow read, write: if false;
     }
